@@ -1,3 +1,11 @@
 {
-  "recommendations": ["Vue.volar"]
+    "recommendations": [
+        "vue.volar",
+        "dbaeumer.vscode-eslint",
+        "mhutchie.git-graph",
+        "yoavbls.pretty-ts-errors",
+        "antfu.iconify",
+        "antfu.unocss",
+        "simonhe.unot"
+    ]
 }
