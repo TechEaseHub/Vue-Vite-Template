@@ -1,0 +1,47 @@
+<script setup lang="ts">
+import { useCssVar } from '@vueuse/core'
+import { ref } from 'vue'
+
+const el = ref(null)
+const color = useCssVar('--color', el)
+
+function switchColor() {
+    if (color.value === '#df8543')
+        color.value = '#7fa998'
+    else
+        color.value = '#df8543'
+}
+
+const elv = ref(null)
+const key = ref('--color')
+const colorVal = useCssVar(key, elv)
+function changeVar() {
+    if (key.value === '--color')
+        key.value = '--color-one'
+    else
+        key.value = '--color'
+}
+</script>
+
+<template>
+    <div>
+        <h2>Page2</h2>
+        <div ref="el" style="--color: #7fa998; color: var(--color)">
+            Sample text, {{ color }}
+        </div>
+        <button @click="switchColor">
+            Change Color
+        </button>
+        <div ref="elv" style="--color: #7fa998; --color-one: #df8543;" :style="{ color: colorVal }">
+            Sample text, {{ key }}: {{ colorVal }}
+        </div>
+        <button style="margin-left: 0;" @click="changeVar">
+            Change Color Variable
+        </button>
+        <div class="h-1000 w-300 bg-blue">
+            123
+        </div>
+    </div>
+</template>
+
+<style scoped lang="scss"></style>
