@@ -9,6 +9,9 @@ import UnoCSS from 'unocss/vite'
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
 
+// element-plus 按需自动导入
+import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
+
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
     const env = loadEnv(mode, process.cwd(), '')
@@ -20,14 +23,23 @@ export default defineConfig(({ mode }) => {
             AutoImport({
                 imports: ['vue', 'vue-router', 'pinia'],
                 dts: 'types/auto-imports.d.ts',
+                resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
             }),
             Components({
                 dts: 'types/components.d.ts',
+                resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
             }),
         ],
         resolve: {
             alias: {
                 '@': fileURLToPath(new URL('./src', import.meta.url)),
+            },
+        },
+        css: {
+            preprocessorOptions: {
+                scss: {
+                    additionalData: `@use "@/styles/element/index.scss" as *;`,
+                },
             },
         },
         server: {

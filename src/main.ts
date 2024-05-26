@@ -5,6 +5,7 @@ import { createPersistedState } from 'pinia-plugin-persistedstate'
 import App from './App.vue'
 import { router } from './router'
 
+import '@/styles/index.scss'
 import '@unocss/reset/tailwind.css'
 import 'uno.css'
 
