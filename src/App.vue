@@ -1,19 +1,17 @@
 <script setup lang="ts">
-import { routes } from './router'
-
-console.log(routes)
-routes.sort((a, b) => (a.meta?.menuOrder || 0) - (b.meta?.menuOrder || 0))
+import zhCn from 'element-plus/es/locale/lang/zh-cn'
 </script>
 
 <template>
-    <div flex="~ justify-center items-center">
-        <template v-for="route in routes" :key="route.path">
-            <RouterLink v-if="route.component" class="m-30" :to="route.path">
-                {{ route.meta?.title }}
-            </RouterLink>
-        </template>
-    </div>
-    <RouterView />
+    <ElConfigProvider
+        :locale="zhCn"
+        :button="{ autoInsertSpace: true }"
+        :message="{ max: 3 }"
+        :value-on-clear="() => undefined"
+        :empty-values="[undefined, null]"
+    >
+        <RouterView />
+    </ElConfigProvider>
 </template>
 
 <style lang="scss">
