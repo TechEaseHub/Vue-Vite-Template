@@ -2,6 +2,9 @@
 import presetRemToPx from '@unocss/preset-rem-to-px'
 import { defineConfig, presetAttributify, presetIcons, presetUno, transformerDirectives, transformerVariantGroup } from 'unocss'
 
+// https://nerdcave.com/tailwind-cheat-sheet  tailwindcss 的类名对照表
+// https://uicolors.app/create 调色板
+
 export default defineConfig({
     content: {
         pipeline: {
