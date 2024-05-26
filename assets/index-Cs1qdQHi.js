@@ -1,1 +1,0 @@
-import{_ as e}from"./_plugin-vue_export-helper-DlAUqK2U.js";import{o as t,c as o,b as c}from"./index-B-hzgy-4.js";const n={},s={"m-20":"",text:"20 center"},r=c("h1",null,"Login",-1),_=[r];function a(i,d){return t(),o("div",s,_)}const l=e(n,[["render",a]]);export{l as default};
