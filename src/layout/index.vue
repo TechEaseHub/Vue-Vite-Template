@@ -6,14 +6,17 @@ import { onBeforeRouteUpdate } from 'vue-router'
 import Logo from './Logo'
 import Menu from './Menu'
 
-import { nestedRoutes } from '@/router'
+import { nestedRoutes, router } from '@/router'
 import { LayoutStore } from '@/stores'
 
 const { height } = useWindowSize()
 
 const isDark = useDark()
 
-const defaultActive = ref(window.location.pathname)
+// 获取当前 vue-router 的激活路由
+// 用于 el-menu 的默认激活项
+const defaultActive = ref<string>(router.currentRoute.value.path)
+
 onBeforeRouteUpdate((to) => {
     defaultActive.value = to.path
 })
