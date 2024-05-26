@@ -1,9 +1,11 @@
+import type { logoMode } from '@/layout/type'
+
 export default defineStore(
     'layout',
     () => {
         /** 侧边栏是否折叠 */
         const isCollapse = ref(false)
-        const logoMode = ref<Layout.logoMode>('vertical')
+        const logoMode = ref<logoMode>('vertical')
 
         /** 切换侧边栏折叠 */
         const changeCollapse = () => {
