@@ -40,7 +40,7 @@ module.exports = {
 			{ value: 'breaking', name: '重大变更|breaking:	💥  引入重大变化', emoji: ':boom:' },
 			{ value: 'chore', name: '杂务|chore:		🔨  对其他的更改', emoji: ':hammer:' },
 		],
-		useEmoji: true,
+		useEmoji: false,
 		emojiAlign: 'center',
 		useAI: false,
 		aiNumber: 1,
