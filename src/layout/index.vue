@@ -1,50 +1,49 @@
 <script setup lang="ts">
-import { useDark, useWindowSize } from '@vueuse/core'
-import { h } from 'vue'
-import { onBeforeRouteUpdate } from 'vue-router'
+import { useWindowSize } from '@vueuse/core'
 
 import Logo from './Logo'
 import Menu from './Menu'
+import UserMenu from './UserMenu.vue'
 
 import { nestedRoutes, router } from '@/router'
 import { LayoutStore } from '@/stores'
 
 const { height } = useWindowSize()
 
-const isDark = useDark()
+const { isCollapse, layoutMode } = storeToRefs(LayoutStore())
 
-// 获取当前 vue-router 的激活路由
-// 用于 el-menu 的默认激活项
-const defaultActive = ref<string>(router.currentRoute.value.path)
+const DefaultActive = computed(() => router.currentRoute.value.path)
+const verticalMenu = computed(() => {
+    if (layoutMode.value === 'mix') {
+        const firstLevelPath = `/${router.currentRoute.value.path.split('/')[1]}`
+        const findRouter = nestedRoutes.find(item => item.path === firstLevelPath)
+        return findRouter ? findRouter.children?.length ? findRouter.children : [findRouter] : []
+    }
 
-onBeforeRouteUpdate((to) => {
-    defaultActive.value = to.path
+    return nestedRoutes
 })
-
-const { isCollapse } = storeToRefs(LayoutStore())
 </script>
 
 <template>
     <el-container class="layout-container" :style="{ height: `${height}px` }">
-        <el-aside :width="isCollapse ? '65px' : '250px'" border="r-1 r-solid r-[var(--el-border-color)]">
+        <el-aside v-if="['vertical', 'mix'].includes(layoutMode)" :width="isCollapse ? '65px' : '250px'" class="no-select" border="r-1 r-solid r-[var(--el-border-color)]">
             <Logo mode="vertical" />
 
-            <el-menu class="border-none!" mode="vertical" :collapse="isCollapse" :default-active="defaultActive" :collapse-transition="false" unique-opened router>
-                <Menu v-for="item in nestedRoutes" :key="item.path" :route="item" />
+            <el-menu class="border-none!" mode="vertical" :collapse="isCollapse" :default-active="DefaultActive" :collapse-transition="false" unique-opened router>
+                <Menu v-for="item in verticalMenu" :key="item.path" :route="item" />
             </el-menu>
         </el-aside>
-        <!--  :style="{ minWidth: '1250px' }" -->
-        <el-container :style="{ minWidth: '1250px' }">
-            <el-header class="flex items-center justify-between overflow-hidden" border="b-1 b-solid b-[var(--el-border-color)]">
-                <Logo mode="horizontal" />
 
-                <el-menu class="flex-grow-1 border-none!" mode="horizontal" :default-active="defaultActive" router>
+        <el-container :style="{ minWidth: '1250px' }">
+            <el-header class="flex items-center justify-between overflow-hidden no-select" border="b-1 b-solid b-[var(--el-border-color)]">
+                <Logo v-if="layoutMode === 'horizontal'" mode="horizontal" />
+
+                <el-menu v-if="['horizontal', 'mix'].includes(layoutMode)" class="flex-grow-1 border-none!" mode="horizontal" :default-active="DefaultActive" router>
                     <Menu v-for="item in nestedRoutes" :key="item.path" :route="item" />
                 </el-menu>
+                <div v-else />
 
-                <div class="px-12">
-                    <el-switch v-model="isDark" inline-prompt size="large" :active-icon=" h('i', { class: ['i-ep:sunny'] })" :inactive-icon=" h('i', { class: ['i-ep:moon'] })" style="--el-switch-off-color: #000" />
-                </div>
+                <UserMenu />
             </el-header>
             <!-- flex! flex-1 -->
             <el-main class="bg-[var(--el-color-info-light-9)]">
@@ -61,8 +60,6 @@ const { isCollapse } = storeToRefs(LayoutStore())
     </el-container>
 </template>
 
-mb-4
 <style scoped lang="scss">
 
 </style>
-mb-4mb-4

@@ -1,9 +1,9 @@
-const routeConfig: RouteConfig = {
+import type { RouteConfig } from 'types/router'
+
+export default {
     meta: {
         title: 'Index',
-        icon: 'i-system-uicons:airplay',
-        menuOrder: 0,
+        icon: 'i-clarity:dashboard-line',
+        order: -99,
     },
-}
-
-export default routeConfig
+} as RouteConfig
