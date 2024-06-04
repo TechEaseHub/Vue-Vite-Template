@@ -9,7 +9,7 @@ function getVerifyCode() {
 </script>
 
 <template>
-    <div class="bg-[#fff] p-20" border="~ rd-10">
+    <div class="bg-[var(--el-bg-color)] p-20" border="~ rd-10">
         <div class="m-12 text-center text-24 font-bold">
             <h2>/login/getVerifyCode</h2>
         </div>
@@ -36,7 +36,7 @@ function getVerifyCode() {
         display: flex;
         justify-content: center;
         align-items: center;
-        background-color: #eee;
+        background-color: var(--el-color-info-light-9);
     }
 }
 </style>
