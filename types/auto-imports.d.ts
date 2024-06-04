@@ -9,7 +9,6 @@ declare global {
   const ElIcon: typeof import('element-plus/es')['ElIcon']
   const ElLink: typeof import('element-plus/es')['ElLink']
   const ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
-  const ElMessage: typeof import('element-plus/es')['ElMessage']
   const ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
   const acceptHMRUpdate: typeof import('pinia')['acceptHMRUpdate']
   const computed: typeof import('vue')['computed']

@@ -3,8 +3,44 @@
 </script>
 
 <template>
-    <div>
-        <h1>Hello World</h1>
+    <div m-20 text="center 20 red-5" bg=" yellow-5">
+        <h1>Index</h1>
+        <div class="bg-blue">
+            Blue 50
+        </div>
+        <div class="bg-blue-50">
+            Blue 50
+        </div>
+        <div class="bg-blue-100">
+            Blue 100
+        </div>
+        <div class="bg-blue-200">
+            Blue 200
+        </div>
+        <div class="bg-blue-300">
+            Blue 300
+        </div>
+        <div class="bg-blue-400">
+            Blue 400
+        </div>
+        <div class="bg-blue-500">
+            Blue 500
+        </div>
+        <div class="bg-blue-600">
+            Blue 600
+        </div>
+        <div class="bg-blue-700">
+            Blue 700
+        </div>
+        <div class="bg-blue-800">
+            Blue 800
+        </div>
+        <div class="bg-blue-900">
+            Blue 900
+        </div>
+        <div class="bg-blue-950">
+            Blue 950
+        </div>
     </div>
 </template>
 

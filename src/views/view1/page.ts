@@ -1,8 +1,8 @@
 const routeConfig: RouteConfig = {
     meta: {
-        title: 'Index',
-        icon: 'i-system-uicons:airplay',
-        menuOrder: 0,
+        title: '父级',
+        icon: 'i-system-uicons:mail',
+        menuOrder: 5,
     },
 }
 

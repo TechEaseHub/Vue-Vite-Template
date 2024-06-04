@@ -7,8 +7,6 @@ interface ImportMetaEnv {
     readonly VITE_BASE_API: string
     /** 代理地址 */
     readonly VITE_PROXY_URL: string
-    /** 项目名称 */
-    readonly VITE_APP_NAME: string
-    /** 项目logo地址 */
-    readonly VITE_LOGO_URL: string
+    /** LogoURL */
+    VITE_LOGIN_URL: string
 }

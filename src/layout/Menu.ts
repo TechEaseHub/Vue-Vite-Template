@@ -10,47 +10,44 @@ export default defineComponent({
             required: true,
         },
     },
-    setup({ route: { path, name, meta, children } }) {
-        const icon = meta?.icon
+    setup({ route }) {
+        const { path, meta } = route
         const title = meta?.title
-        console.log(children)
+        const icon = meta?.icon
+
+        const one = () => {
+            if (route.children?.length === 0) {
+                return h(
+                    ElMenuItem,
+                    {
+                        index: path,
+                    },
+                    {
+                        default: () => h(ElIcon, () => h('i', { class: icon })),
+                        title: () => `${title}`,
+                    },
+                )
+            }
+            else {
+                return h(
+                    ElSubMenu,
+                    {
+                        index: path,
+                    },
+                    {
+                        default: () => {
+                            return route.children?.map((child) => {
+                                return h(Menu, { route: child })
+                            })
+                        },
+                        title: () => [h(ElIcon, () => h('i', { class: icon })), h('span', title)],
+                    },
+                )
+            }
+        }
 
         return () => {
-            switch (children?.length) {
-                case 0:
-                    return h(
-                        ElMenuItem,
-                        { index: path },
-                        {
-                            default: () => h(ElIcon, () => h('i', { class: icon ?? 'i-ep:document' })),
-                            title: () => title || name,
-                        },
-                    )
-
-                case 1:
-                    return h(
-                        ElMenuItem,
-                        { index: children![0].path },
-                        {
-                            default: () => h(ElIcon, () => h('i', { class: icon ?? 'i-ep:document' })),
-                            title: () => children![0].meta?.title || children![0].name,
-                        },
-                    )
-
-                default:
-                    return h(
-                        ElSubMenu,
-                        { index: path },
-                        {
-                            default: () => {
-                                return children?.map((child) => {
-                                    return h(Menu, { route: child })
-                                })
-                            },
-                            title: () => [h(ElIcon, () => h('i', { class: icon ?? 'i-ep:folder' })), h('span', title || name as string)],
-                        },
-                    )
-            }
+            return one()
         }
     },
 
