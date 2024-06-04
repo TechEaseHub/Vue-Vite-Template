@@ -1,30 +1,15 @@
-import type { LayoutMode } from '@/layout/type'
+import type { logoMode } from '@/layout/type'
 
 export default defineStore(
     'layout',
     () => {
-        /**
-         * 侧边栏是否折叠
-         *
-         * @default false
-         */
+        /** 侧边栏是否折叠 */
         const isCollapse = ref(false)
+        const logoMode = ref<logoMode>('vertical')
+
         /** 切换侧边栏折叠 */
         const changeCollapse = () => {
             isCollapse.value = !isCollapse.value
-        }
-        /**
-         * LayoutMode 布局模式
-         *
-         * @default 'vertical'
-         */
-        const layoutMode = ref<LayoutMode>('vertical')
-        /**
-         * 设置 LayoutMode 布局模式
-         * @param mode `horizontal` | `vertical` | `mix`
-         */
-        const SetLayoutMode = (mode: LayoutMode) => {
-            layoutMode.value = mode
         }
 
         // 使用  Setup Stores 需要创建自己的 $reset() 方法
@@ -32,7 +17,7 @@ export default defineStore(
 
         }
 
-        return { isCollapse, changeCollapse, layoutMode, SetLayoutMode, $reset }
+        return { isCollapse, logoMode, changeCollapse, $reset }
     },
     {
         persist: true,
