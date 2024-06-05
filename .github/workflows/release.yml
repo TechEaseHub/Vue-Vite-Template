@@ -1,0 +1,31 @@
+name: Release
+
+on:
+  workflow_dispatch:  # 手动触发
+  push:
+    tags:
+      - 'v*'
+
+jobs:
+  build:
+    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境
+
+    steps:
+    - name: Checkout repository  # 检出仓库代码
+      uses: actions/checkout@v2
+
+    - name: Set up Node.js using pnpm  # 设置 Node.js 和 pnpm
+      uses: pnpm/action-setup@v2
+      with:
+        version: latest  # 安装最新版本的 pnpm
+
+    - name: Set up Node.js version and cache dependencies  # 设置 Node.js 版本并缓存依赖
+      uses: actions/setup-node@v3
+      with:
+        node-version: lts/*  # 使用最新的 LTS 版本的 Node.js
+        cache: pnpm  # 缓存 pnpm 的依赖
+
+    - name: Install dependencies  # 安装项目依赖
+      run: pnpm install
+
+    - run: npx changelogithub
