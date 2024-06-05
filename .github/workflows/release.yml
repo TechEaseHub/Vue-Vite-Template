@@ -1,5 +1,8 @@
 name: Release
 
+permissions:
+  contents: write
+
 on:
   workflow_dispatch:  # 手动触发
   push:
@@ -7,25 +10,17 @@ on:
       - 'v*'
 
 jobs:
-  build:
-    runs-on: ubuntu-latest  # 使用最新的 Ubuntu 环境
-
+  release:
+    runs-on: ubuntu-latest
     steps:
-    - name: Checkout repository  # 检出仓库代码
-      uses: actions/checkout@v2
+      - uses: actions/checkout@v3
+        with:
+          fetch-depth: 0
 
-    - name: Set up Node.js using pnpm  # 设置 Node.js 和 pnpm
-      uses: pnpm/action-setup@v2
-      with:
-        version: latest  # 安装最新版本的 pnpm
+      - uses: actions/setup-node@v3
+        with:
+          node-version: 16.x
 
-    - name: Set up Node.js version and cache dependencies  # 设置 Node.js 版本并缓存依赖
-      uses: actions/setup-node@v3
-      with:
-        node-version: lts/*  # 使用最新的 LTS 版本的 Node.js
-        cache: pnpm  # 缓存 pnpm 的依赖
-
-    - name: Install dependencies  # 安装项目依赖
-      run: pnpm install
-
-    - run: npx changelogithub
+      - run: npx changelogithub # or changelogithub@0.12 if ensure the stable result
+        env:
+          GITHUB_TOKEN: ${{secrets.GITHUB_TOKEN}}
