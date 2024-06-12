@@ -14,8 +14,8 @@ import type { RouteRecordRaw } from 'vue-router'
  *
  * @example
  *
- * const pages = import.meta.glob([../views/xxx/page.ts], { eager: true })
- * const pageComps = import.meta.glob([../views/xxx/index.vue], { import: 'default' })
+ * const pages = import.meta.glob(["../views/xxx/page.ts"], { eager: true })
+ * const pageComps = import.meta.glob(["../views/xxx/index.vue"], { import: 'default' })
  */
 function buildFlatRoutes(pages: Pages, pageComps: PageComps): RouteRecordRaw[] {
     return Object.entries(pages).sort((a, b) => {
@@ -50,6 +50,10 @@ function buildNestedRoutes(FlatRoutes: RouteRecordRaw[]): RouteRecordRaw[] {
 
     FlatRoutes.forEach(route => RouterMap.set(route.path, { ...route, children: [] }))
     RouterMap.forEach((route) => {
+        // 如果当前路由有子路由，并别当前路由存在 component 属性，则将当前路由的 component 添加到子路由的顶部
+        if (route.children && route.component)
+            route.children.unshift({ ...route, children: [] })
+
         const parentRoutePath = route.path.split('/').slice(0, -1).join('/') || '/'
         const parentRoute = RouterMap.get(parentRoutePath)
 
