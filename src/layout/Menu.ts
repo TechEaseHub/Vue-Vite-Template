@@ -13,7 +13,6 @@ export default defineComponent({
     setup({ route: { path, name, meta, children } }) {
         const icon = meta?.icon
         const title = meta?.title
-        console.log(children)
 
         return () => {
             switch (children?.length) {

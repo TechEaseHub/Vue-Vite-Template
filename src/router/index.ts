@@ -9,16 +9,9 @@ const pages: Pages = import.meta.glob(['../views/**/page.ts', '!../views/compone
 const pageComps: PageComps = import.meta.glob(['../views/**/index.vue', '!../views/components/**/index.vue'], { import: 'default' })
 
 const FlatRoutes = buildFlatRoutes(pages, pageComps)
-console.log('🚀 ~ FlatRoutes:\n', FlatRoutes)
-
-// const routes: RouteRecordRaw[] = RouteGroup.firstLevelRoutes.concat(RouteGroup.secondLevelRoutes)
-// const nestedRoutes: RouteRecordRaw[] = buildNestedRoutes(RouteGroup)
 
 const routes: RouteRecordRaw[] = FlatRoutes.filter(route => route.component)
-console.time('nestedRoutes')
 const nestedRoutes: RouteRecordRaw[] = buildNestedRoutes(FlatRoutes)
-console.timeEnd('nestedRoutes')
-console.log('🚀 ~ nestedRoutes:\n', nestedRoutes)
 
 const router = createRouter({
     history: createWebHashHistory(),
