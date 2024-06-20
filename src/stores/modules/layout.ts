@@ -1,6 +1,6 @@
-import type { LayoutMode } from '@/layout/type'
+export type LayoutMode = 'horizontal' | 'vertical' | 'mix'
 
-export default defineStore(
+export const LayoutStore = defineStore(
     'layout',
     () => {
         /**

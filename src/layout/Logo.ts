@@ -1,5 +1,4 @@
-import type { LayoutMode } from './type'
-import { LayoutStore } from '@/stores'
+import { type LayoutMode, LayoutStore } from '@/stores'
 
 import LogoSrc from '@/assets/logo.svg'
 
