@@ -13,6 +13,7 @@ const { height } = useWindowSize()
 const { isCollapse, layoutMode } = storeToRefs(LayoutStore())
 
 const DefaultActive = computed(() => router.currentRoute.value.path)
+
 const verticalMenu = computed(() => {
     if (layoutMode.value === 'mix') {
         const firstLevelPath = `/${router.currentRoute.value.path.split('/')[1]}`

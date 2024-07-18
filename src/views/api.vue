@@ -1,6 +1,15 @@
 <script setup lang="ts">
 import { User } from '@/api'
 
+definePage({
+    path: '/api',
+    name: 'API',
+    meta: {
+        title: 'API',
+        icon: 'i-ant-design:api-twotone',
+    },
+})
+
 const UserApi = new User()
 const imageSrc = ref('')
 function getVerifyCode() {
