@@ -1,7 +1,7 @@
 import { URL, fileURLToPath } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
-import vue from '@vitejs/plugin-vue'
+import Vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
 import UnoCSS from 'unocss/vite'
@@ -9,13 +9,15 @@ import UnoCSS from 'unocss/vite'
 // 自动导入
 import AutoImport from 'unplugin-auto-import/vite'
 import Components from 'unplugin-vue-components/vite'
-
 // element-plus 按需自动导入
 import { ElementPlusResolver } from 'unplugin-vue-components/resolvers'
 
+// 路由自动导入
+import VueRouter from 'unplugin-vue-router/vite'
+import { VueRouterAutoImports } from 'unplugin-vue-router'
+
 // 打包分析
 import { visualizer } from 'rollup-plugin-visualizer'
-// GZIP 压缩
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -23,12 +25,24 @@ export default defineConfig(({ mode }) => {
 
     return {
         plugins: [
-            vue(),
+            // https://github.com/posva/unplugin-vue-router
+            VueRouter({
+                routesFolder: 'src/views',
+                exclude: ['src/views/public/**/*.vue'],
+                dts: 'types/typed-router.d.ts',
+            }),
+            Vue(),
             vueDevTools(),
             UnoCSS(),
             AutoImport({
-                imports: ['vue', 'vue-router', 'pinia'],
+                imports: [
+                    'vue',
+                    'pinia',
+                    VueRouterAutoImports,
+                    { 'vue-router/auto': ['useLink'] },
+                ],
                 dts: 'types/auto-imports.d.ts',
+                dirs: ['src/stores'],
                 resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
             }),
             Components({

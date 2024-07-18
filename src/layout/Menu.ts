@@ -16,7 +16,7 @@ export default defineComponent({
 
         return () => {
             switch (children?.length) {
-                case 0:
+                case 0 || undefined:
                     return h(
                         ElMenuItem,
                         { index: path },

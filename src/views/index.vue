@@ -1,5 +1,12 @@
 <script setup lang="ts">
-
+definePage({
+    path: '/',
+    meta: {
+        title: 'Index',
+        icon: 'i-clarity:dashboard-line',
+        order: -99,
+    },
+})
 </script>
 
 <template>
