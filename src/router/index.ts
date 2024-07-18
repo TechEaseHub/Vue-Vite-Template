@@ -1,7 +1,17 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import type { RouteRecordRaw } from 'vue-router'
-
 import { routes } from 'vue-router/auto-routes'
+
+declare module 'vue-router' {
+    interface RouteMeta {
+        /** 标题 */
+        title?: string
+        /** 图标 */
+        icon?: string
+        /** 菜单排序 */
+        order?: number
+    }
+}
 
 const nestedRoutes: RouteRecordRaw[] = sortRoutesByOrder(routes)
 
