@@ -47,6 +47,7 @@ export default antfu(
             'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
             'no-console': 'off',
             'node/prefer-global/process': 'off',
+            'unused-imports/no-unused-imports': 'warn',
         },
     },
 )

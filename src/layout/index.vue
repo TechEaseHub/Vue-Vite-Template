@@ -6,13 +6,13 @@ import Menu from './Menu'
 import UserMenu from './UserMenu.vue'
 
 import { nestedRoutes, router } from '@/router'
-import { LayoutStore } from '@/stores'
 
 const { height } = useWindowSize()
 
 const { isCollapse, layoutMode } = storeToRefs(LayoutStore())
 
 const DefaultActive = computed(() => router.currentRoute.value.path)
+
 const verticalMenu = computed(() => {
     if (layoutMode.value === 'mix') {
         const firstLevelPath = `/${router.currentRoute.value.path.split('/')[1]}`
@@ -47,6 +47,7 @@ const verticalMenu = computed(() => {
             </el-header>
             <!-- flex! flex-1 -->
             <el-main class="bg-[var(--el-color-info-light-9)]">
+                <!-- TODO:为什么要用 flex flex-col -->
                 <div class="flex flex-col">
                     <RouterView />
                     <!-- <RouterView v-slot="{ Component }">

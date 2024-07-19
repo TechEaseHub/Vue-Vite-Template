@@ -3,8 +3,6 @@ import { h } from 'vue'
 
 import { useDark } from '@vueuse/core'
 
-import { LayoutStore } from '@/stores'
-
 const layoutStore = LayoutStore()
 
 const isDark = useDark()

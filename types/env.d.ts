@@ -1,4 +1,5 @@
 /// <reference types="vite/client" />
+
 /** 环境变量类型 */
 interface ImportMetaEnv {
     /** 命名空间 */
