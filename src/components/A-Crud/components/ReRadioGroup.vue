@@ -1,13 +1,10 @@
 <script setup lang="ts">
 interface Options { label: string, value: string | number, disabled: boolean }
 
-defineProps({
-    options: {
-        type: Array as PropType<Options[]>,
-        required: true,
-    },
-    isButton: Boolean,
-})
+defineProps<{
+    options: Options[]
+    isButton?: boolean
+}>()
 
 const value = defineModel<string | number | undefined>({ required: true })
 

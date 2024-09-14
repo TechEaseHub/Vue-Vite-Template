@@ -1,55 +1,158 @@
-import { getValueFromRow } from './Hooks'
-import type { BaseRow, ColumnsItemType } from './Type'
+import { getValueFromRow } from './hooks/index'
+import type { BaseRow, ColumnsItemType } from './hooks/index.types'
 import ReDeleteFlag from './components/ReDeleteFlag.vue'
 import ReRadioGroup from './components/ReRadioGroup.vue'
 
-export { default as CrudSearchForm } from './src/SearchForm.vue'
-export { default as CrudActionArea } from './src/ActionArea.vue'
-export { default as CrudTable } from './src/Table.vue'
-export { default as CrudDrawer } from './src/EditForm.vue'
+export * from './hooks/index'
+export * from './hooks/index.types'
 
-export * from './Type'
-export * from './Hooks'
-
-export { default as ReDeleteFlag } from './components/ReDeleteFlag.vue'
-export { default as ReSelect } from './components/ReSelect.vue'
-export { default as ReRadioGroup } from './components/ReRadioGroup.vue'
-export { default as ReCheckboxGroup } from './components/ReCheckboxGroup.vue'
-
-export function CommonProps<T extends BaseRow>() {
-    const operatorName: ColumnsItemType<T> = {
+export function CommonProps<T extends BaseRow = BaseRow>() {
+    /**
+     * ID 类型样式
+     * @example
+     * const ID: ColumnsItemType<T, keyof T> = {
+     *   type: markRaw(ElInput),
+     *   label: 'ID',
+     *   tableProps: { width: 100, align: 'right' },
+     * }
+     */
+    const Id: ColumnsItemType<T, keyof T> = {
         type: markRaw(ElInput),
-        label: '操作人账号',
+        label: 'ID',
+        tableProps: { width: 100, align: 'right' },
     }
-    const deleteFlag: ColumnsItemType<T> = {
+    const Name: ColumnsItemType<T, keyof T> = {
+        type: markRaw(ElInput),
+        label: 'Name',
+        tableProps: { width: 120 },
+    }
+
+    /**
+     * 日期选择器
+     * @example
+     * const datePicker: ColumnsItemType<T, keyof T> = {
+     *     type: markRaw(ElDatePicker),
+     *     label: '日期选择器',
+     *     componentProps: {
+     *         type: 'date',
+     *         format: 'YYYY-MM-DD',
+     *         valueFormat: 'YYYY-MM-DD',
+     *     },
+     *     tableProps: { width: 110, align: 'center' },
+     * }
+     */
+    const datePicker: ColumnsItemType<T, keyof T> = {
+        type: markRaw(ElDatePicker),
+        label: '日期选择器',
+        componentProps: {
+            type: 'date',
+            format: 'YYYY-MM-DD',
+            valueFormat: 'YYYY-MM-DD',
+        },
+        tableProps: { width: 110, align: 'center' },
+    }
+    /**
+     * 日期时间选择器
+     * @example
+     * const datePicker: ColumnsItemType<T, keyof T> = {
+     *   type: markRaw(ElDatePicker),
+     *   label: '日期时间选择器',
+     *   componentProps: {
+     *     type: 'datetime',
+     *     format: 'YYYY-MM-DD HH:mm:ss',
+     *     valueFormat: 'YYYY-MM-DD HH:mm:ss',
+     *   },
+     *   tableProps: { width: 175, align: 'center' },
+     * }
+     */
+    const datetimePicker: ColumnsItemType<T, keyof T> = {
+        type: markRaw(ElDatePicker),
+        label: '日期时间选择器',
+        componentProps: {
+            type: 'datetime',
+            format: 'YYYY-MM-DD HH:mm:ss',
+            valueFormat: 'YYYY-MM-DD HH:mm:ss',
+        },
+        tableProps: { width: 175, align: 'center' },
+    }
+
+    // 所有表的基础字段
+    const operatorName: ColumnsItemType<T, 'operatorName'> = {
+        type: markRaw({}),
+        label: '操作人账号',
+        tableProps: { width: 100, align: 'center' },
+    }
+    const deleteFlag: ColumnsItemType<T, 'deleteFlag'> = {
         type: markRaw(ReRadioGroup),
         label: '状态',
         searchDefaultValue: 0,
         componentProps: { options: [], isButton: true },
         tableProps: { width: 70, align: 'center' },
         render: ({ row, crudOptions }) => {
-            const { url, actionsName, rowKey, rowKeys } = crudOptions.ApiConfig
-            const formData = { ...getValueFromRow(row, rowKeys.length > 0 ? rowKeys : rowKey), deleteFlag: row.deleteFlag === 0 ? 1 : 0 }
+            const { url, apiEndpoints, rowKey, rowKeys } = crudOptions.config
+            const keyToUse = rowKeys && rowKeys.length > 0 ? rowKeys : rowKey
+
+            let formData = { deleteFlag: row.deleteFlag === 0 ? 1 : 0 }
+            if (keyToUse) {
+                formData = {
+                    ...getValueFromRow(row, keyToUse),
+                    deleteFlag: row.deleteFlag === 0 ? 1 : 0,
+                }
+            }
 
             return h(
                 ReDeleteFlag,
                 {
                     'size': 'small',
-                    'modelValue': row.deleteFlag,
+                    'modelValue': row.deleteFlag ?? 0,
                     'onUpdate:modelValue': (newValue) => { row.deleteFlag = newValue },
-                    'url': `${url}/${actionsName.deleteFlag}`,
+                    'url': `${url}/${apiEndpoints?.deleteFlag}`,
                     'formData': formData,
+                    // 使用权限来添加是否禁用
+                    // 'disabled': true,
                 },
             )
         },
     }
-    const createTime: ColumnsItemType<T> = {
-        type: markRaw(ElInput),
+    const createTime: ColumnsItemType<T, 'createTime'> = {
+        type: markRaw({}),
         label: '创建时间',
+        tableProps: { width: 175, align: 'center' },
     }
-    const updateTime: ColumnsItemType<T> = {
-        type: markRaw(ElInput),
-        label: '更新时间',
+    const updateTime: ColumnsItemType<T, 'updateTime'> = {
+        type: markRaw({}),
+        label: '最后更新时间',
+        tableProps: { width: 175, align: 'center' },
     }
-    return { operatorName, deleteFlag, createTime, updateTime }
+
+    return {
+        Id,
+        Name,
+
+        recId: Id,
+        datePicker,
+        datetimePicker,
+        startTime: datePicker,
+        endTime: datetimePicker,
+        startTimeStart: datetimePicker,
+        startTimeEnd: datetimePicker,
+        endTimeStart: datetimePicker,
+        endTimeEnd: datetimePicker,
+
+        operatorName,
+        deleteFlag,
+        createTime,
+        updateTime,
+    }
+}
+
+/**
+ * 类型保护函数，用于判断给定的数据是否为 FormData 类型。
+ *
+ * @template T - 泛型参数，表示传入的数据类型。
+ * @param {T | FormData} data - 要检查的数据，可以是任意类型或 FormData 类型。
+ * @returns {data is FormData} - 如果数据是 FormData 类型，则返回 true，否则返回 false。
+ */
+export function isFormData<T>(data: T | FormData): data is FormData {
+    return data instanceof FormData
 }
