@@ -1,14 +1,13 @@
 <script setup lang="ts">
-interface Options { label: string, value: string, disabled: boolean }
-type Value = string | number | undefined
+import type { CheckboxGroupValueType } from 'element-plus'
 
-defineProps({
-    options: {
-        type: Array as PropType<Options[]>,
-        required: true,
-    },
-    isButton: Boolean,
-})
+interface Options { label: string, value: string, disabled: boolean }
+type Value = CheckboxGroupValueType | undefined
+
+defineProps<{
+    options: Options[]
+    isButton?: boolean
+}>()
 
 const value = defineModel<Value>({ required: true })
 </script>
