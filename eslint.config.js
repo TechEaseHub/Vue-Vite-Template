@@ -38,6 +38,7 @@ export default antfu(
         files: ['**/*.vue'],
         rules: {
             'vue/operator-linebreak': ['error', 'before'],
+            'vue/attributes-order': 'off',
         },
     },
     {
@@ -48,6 +49,7 @@ export default antfu(
             'no-console': 'off',
             'node/prefer-global/process': 'off',
             'unused-imports/no-unused-imports': 'warn',
+            '@typescript-eslint/no-use-before-define': ['error', { variables: false, functions: false, classes: true }],
         },
     },
 )

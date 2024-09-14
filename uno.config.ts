@@ -30,6 +30,9 @@ export default defineConfig({
     // 快捷方式
     shortcuts: [
         ['flex-center', 'flex justify-center items-center'],
+        ['div-center', 'm-auto text-[32px] font-bold'],
+        ['flex-c', 'flex-center'],
+        ['div-c', 'div-center'],
     ],
     rules: [
         [
