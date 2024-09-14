@@ -1,17 +1,17 @@
 <script setup lang="ts">
-import { attributes } from '.'
-
 definePage({
+    path: '/example/one',
     meta: {
-        title: '用户管理',
-        icon: 'i-clarity:dashboard-line',
+        title: '示例1',
         order: 1,
     },
 })
 </script>
 
 <template>
-    <ACrud v-bind="attributes" />
+    <div class="div-c">
+        示例1
+    </div>
 </template>
 
 <style scoped lang="scss">

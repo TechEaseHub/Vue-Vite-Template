@@ -34,7 +34,5 @@ export const LayoutStore = defineStore(
 
         return { isCollapse, changeCollapse, layoutMode, SetLayoutMode, $reset }
     },
-    {
-        persist: true,
-    },
+    { persist: true },
 )

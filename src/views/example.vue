@@ -1,7 +1,7 @@
 <script setup lang="ts">
 definePage({
     meta: {
-        title: 'CRUD 示例',
+        title: '示例',
     },
 })
 </script>
