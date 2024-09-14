@@ -9,7 +9,7 @@ const router = useRouter()
 const userStore = useUserStore()
 
 definePage({
-    path: '/dashboard/api',
+    path: '/example/api',
     meta: {
         title: 'API 接口',
         icon: 'i-ant-design:api-twotone',
