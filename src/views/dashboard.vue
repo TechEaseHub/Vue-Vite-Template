@@ -1,8 +1,11 @@
 <script setup lang="ts">
 definePage({
+    alias: ['/', '/dashboard', '/home'],
+    redirect: '/dashboard/home',
     meta: {
-        title: '多级菜单',
+        title: '首页',
         icon: 'i-ep:menu',
+        order: -99,
     },
 })
 </script>

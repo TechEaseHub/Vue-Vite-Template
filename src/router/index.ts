@@ -1,62 +1,111 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
-import type { RouteRecordRaw } from 'vue-router'
-import { routes } from 'vue-router/auto-routes'
 
 declare module 'vue-router' {
     interface RouteMeta {
-        /** 标题 */
-        title?: string
         /** 图标 */
         icon?: string
+        /** 标题 */
+        title?: string
         /** 菜单排序 */
         order?: number
+        /** 在菜单中隐藏 */
+        hideInMenu?: boolean
+        /** 需要权限 */
+        auth?: string[]
     }
+
 }
 
-const nestedRoutes: RouteRecordRaw[] = sortRoutesByOrder(routes)
-
 const router = createRouter({
-    history: createWebHashHistory(),
+    history: createWebHashHistory(), // createWebHashHistory createWebHistory
     routes: [
-        {
-            path: '/',
-            component: () => import('@/layout/index.vue'),
-            children: routes,
-        },
         {
             path: '/login',
             name: 'Login',
             component: () => import('@/views/public/login.vue'),
         },
         {
+            path: '/error',
+            name: 'Error',
+            redirect: '/404',
+            meta: { title: '异常页面', hideInMenu: true },
+            children: [
+                {
+                    path: '/403',
+                    name: 'Error403',
+                    component: () => import('@/views/public/error-page/403.vue'),
+                    meta: { title: '403' },
+                },
+                {
+                    path: '/404',
+                    name: 'Error404',
+                    component: () => import('@/views/public/error-page/404.vue'),
+                    meta: { title: '404' },
+                },
+                {
+                    path: '/500',
+                    name: 'Error500',
+                    component: () => import('@/views/public/error-page/500.vue'),
+                    meta: { title: '500' },
+                },
+            ],
+        },
+        {
             path: '/:pathMatch(.*)*',
             name: 'NotFound',
-            component: () => import('@/views/public/404.vue'),
+            redirect: '/404',
         },
     ],
 })
 
-function sortRoutesByOrder(routes: RouteRecordRaw[]): RouteRecordRaw[] {
-    // 对当前层级的路由进行排序
-    routes.sort((a, b) => {
-        // 使用可选链和空值合并运算符来安全地获取 order 值
-        const orderA = a.meta?.order ?? 0
-        const orderB = b.meta?.order ?? 0
-        return orderA - orderB
-    })
+// 路由白名单，不需要登录即可访问
+const WHITE_LIST = ['/login', '/question']
+router.beforeEach((to, from) => {
+    NProgress.start()
 
-    // 递归地对每个子路由数组进行排序
-    routes.forEach((route) => {
-        if (route.children && Array.isArray(route.children))
-            sortRoutesByOrder(route.children) // 直接修改子路由数组，因为我们已经传入了引用
-    })
+    // console.log('路由守卫：', {
+    //     toPath: to.path,
+    //     redirectedFrom: !!to.redirectedFrom,
+    //     to,
+    //     from,
+    // })
 
-    // 注意：这个函数直接修改了传入的数组。如果你不希望修改原数组，
-    // 请在函数开始时创建一个数组的副本，并在副本上进行操作。
+    const { path, meta: { auth } } = to
 
-    // 由于我们没有创建新数组，因此返回原始数组引用也是可以的，
-    // 但为了清晰起见，这里还是显式返回它。
-    return routes
-}
+    const userStore = useUserStore()
+    const { isLogin, isAddRoute } = storeToRefs(userStore)
+    const { isAuth, addRoute } = userStore
 
-export { router, routes, nestedRoutes }
+    if (isLogin.value) {
+        if (path === '/login')
+            return from // 阻止导航，保持在当前页面
+
+        if (!isAuth(auth))
+            return { path: '/403' } // 没有权限访问，跳转403
+
+        if (!isAddRoute.value) {
+            isAddRoute.value = true
+            addRoute()
+
+            if (to.path === '/404' && to.redirectedFrom)
+                return { path: to.redirectedFrom.fullPath, replace: true } // 重新导航到重定向之前的路径
+
+            return { ...to, replace: true } // 动态添加路由后，重新导航
+        }
+
+        return // 已登录且已添加动态路由，直接继续导航
+    }
+
+    if (WHITE_LIST.includes(path))
+        return // 白名单页面直接放行
+
+    return { path: '/login' } // 未登录且非白名单，重定向到登录页
+})
+
+router.afterEach((to) => {
+    document.title = `${to.meta.title || '页面'}  |  ${import.meta.env.VITE_APP_NAME}`
+
+    NProgress.done()
+})
+
+export { router }

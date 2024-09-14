@@ -1,5 +1,8 @@
+import NProgress from 'nprogress'
+import 'nprogress/nprogress.css'
+
 import axios, { isCancel } from 'axios'
-import type { AxiosError, AxiosInstance, AxiosRequestConfig, CancelTokenSource, InternalAxiosRequestConfig, ResponseData } from 'axios'
+import type { AxiosError, AxiosInstance, AxiosRequestConfig, AxiosResponse, CancelTokenSource, InternalAxiosRequestConfig, ResponseData } from 'axios'
 
 declare module 'axios' {
     interface InternalAxiosRequestConfig {
@@ -20,6 +23,11 @@ declare module 'axios' {
          * @default 1000
          */
         retryDelay?: number
+        /**
+         * 是否需要取消请求
+         * @default true
+         */
+        isCancelToken?: boolean
     }
 
     interface ResponseData<T = any> {
@@ -37,12 +45,20 @@ declare module 'axios' {
     }
 }
 
+const BASE_API = import.meta.env.VITE_BASE_API
+const TOKEN = import.meta.env.VITE_TOKEN_NAME
+const TIME_OUT = 1000 * 5
+const RETRY = 3
+const RETRY_DELAY = 1000
+
 // HTTP 客户端类
 class HttpClient {
+    /** axios 实例 */
     private instance: AxiosInstance
+    /** 请求取消 Token 映射表 */
     private cancelTokenSourceMap: Map<string, CancelTokenSource>
 
-    constructor(options: AxiosRequestConfig = { baseURL: import.meta.env.VITE_BASE_API }) {
+    constructor(options: AxiosRequestConfig = {}) {
         this.instance = this.createAxiosInstance(options)
         this.cancelTokenSourceMap = new Map<string, CancelTokenSource>()
 
@@ -53,8 +69,8 @@ class HttpClient {
     /** 创建 axios 实例 */
     private createAxiosInstance(options: AxiosRequestConfig) {
         return axios.create({
-            timeout: 1000 * 2, // 请求超时时间设置为 2 秒
-            headers: { 'Content-Type': 'application/json' }, // 设置请求头为 JSON 格式
+            baseURL: BASE_API,
+            isCancelToken: true,
             ...options,
         })
     }
@@ -63,23 +79,22 @@ class HttpClient {
     private httpInterceptorsRequest() {
         this.instance.interceptors.request.use(
             (config) => {
-                // console.log('【发起请求、成功】拦截器', this.cancelTokenSourceMap, config)
+                // 根据后端要求： 请求头添加 Authorization token
+                config.headers.Authorization = sessionStorage.getItem(TOKEN)
 
                 // 保存原始的 url 和 baseURL
                 config._originalBaseURL = config.baseURL
                 config._originalUrl = config.url
 
-                // 添加请求取消功能
-                this.handleCancelToken(config)
+                // 添加请求取消功能，默认开启
+                if (config.isCancelToken)
+                    this.handleCancelToken(config)
 
-                // 请求头添加 Authorization token
-                config.headers.Authorization = sessionStorage.getItem('Authorization')
-
+                // console.log('【发起请求、成功】拦截器', this.cancelTokenSourceMap, config)
                 return config
             },
             (error) => {
                 // console.log('【发起请求、失败】拦截器\n', error)
-
                 return Promise.reject(error)
             },
         )
@@ -88,45 +103,191 @@ class HttpClient {
     /** 添加响应拦截器 */
     private httpInterceptorsResponse() {
         this.instance.interceptors.response.use(
-            (response) => {
+            (response: AxiosResponse) => {
                 // console.log('【响应成功】拦截器\n', response)
                 this.removeCancelToken(response.config)
 
-                // 如果接口响应类型是 blob， 直接返回
-                if (response.config.responseType === 'blob')
+                // 检查 Content-Type 是否存在
+                const contentType = response.headers['content-type']
+
+                // 处理验证码接口的特殊情况
+                if (!contentType && response.config.url === '/login/getVerifyCode')
                     return response.data
+
+                // 如果 Content-Type 不存在，发出警告
+                if (!contentType) {
+                    console.warn(
+                        '未检测到正确的 Content-Type，可能需要手动处理响应数据。',
+                        { response },
+                    )
+                    return response
+                }
+
+                // 根据 Content-Type 进行处理
+                switch (contentType) {
+                    case 'application/octet-stream':
+                        return response
+
+                    default:
+                        console.log('其他类型')
+                        break
+                }
 
                 // 处理接口返回的错误消息
                 if (response.data.code !== 0) {
-                    ElMessage.error(response.data.message)
-                    return Promise.reject(response.data)
+                    this.handleErrorNotification(response)
+
+                    return Promise.reject(response)
                 }
 
                 return response.data
             },
             (error) => {
                 // console.log('【响应失败】拦截器\n', error)
-
                 if (error.config)
                     this.removeCancelToken(error.config)
 
-                // 请求超时处理
-                if (error.code === 'ECONNABORTED' && error.message.includes('timeout'))
+                if (this.isTimeoutError(error))
                     return this.handleTimeoutError(error, this.Request.bind(this))
 
-                console.log('其他请求错误处理', error)
-                if (error.response?.status === 401) {
-                    // 处理授权错误，例如跳转到登录页
-                }
+                this.handleCommonErrors(error)
 
-                ElNotification({
-                    type: 'error',
-                    title: error.name,
-                    message: error.message,
-                })
                 return Promise.reject(error)
             },
         )
+    }
+
+    /** 默认 instance.request 请求方法 */
+    public request<Res = any, Req = any>(config: AxiosRequestConfig<Req>) {
+        return this.instance.request<any, Res, Req>(config)
+    }
+
+    /** 超时取消 请求方法 */
+    public Request<Res = any, Req = any>(config: AxiosRequestConfig<Req>) {
+        /** 取消请求的令牌 */
+        const cancelToken = ref<CancelTokenSource>(axios.CancelToken.source())
+
+        // 设置连接超时
+        const timeoutId = setTimeout(() => {
+            cancelToken.value.cancel('超时手动取消请求')
+        }, config?.timeout ?? TIME_OUT)
+
+        // 移除配置的timeout，手动控制超时
+        config.timeout = undefined
+
+        let isDownload = false
+
+        return this.instance.request<any, ResponseData<Res>, Req>({
+            onDownloadProgress: () => {
+                if (isDownload)
+                    return
+                clearTimeout(timeoutId)
+                isDownload = true
+            },
+            cancelToken: cancelToken.value?.token,
+            ...config,
+        })
+    }
+
+    /** GET 请求方法 */
+    public async GET<Res = any, Req = any>(url: string, config?: AxiosRequestConfig<Req>): Promise<Res> {
+        return (await this.Request<Res, Req>({ url, method: 'GET', ...config })).data
+    }
+
+    /** POST 请求方法，响应为原始响应的 data 属性 */
+    public async POST<Res = any, Req = any>(url: string, data: Req, config?: AxiosRequestConfig<Req>): Promise<Res> {
+        return (await this.Request<Res, Req>({ url, data, method: 'POST', ...config })).data
+    }
+
+    /** 自动3次重试 请求方法 */
+    public RetryRequest<Res = any, Req = any>(config: AxiosRequestConfig<Req>) {
+        return this.instance.request<any, ResponseData<Res>, Req>({ method: 'POST', timeout: TIME_OUT, retry: RETRY, retryDelay: RETRY_DELAY, ...config })
+    }
+
+    /** GET 请求方法 */
+    public async RetryGET<Res = any, Req = any>(url: string, config?: AxiosRequestConfig<Req>): Promise<Res> {
+        return (await this.RetryRequest<Res, Req>({ url, method: 'GET', ...config })).data
+    }
+
+    /** POST 请求方法，响应为原始响应的 data 属性 */
+    public async RetryPOST<Res = any, Req = any>(url: string, data: Req, config?: AxiosRequestConfig<Req>): Promise<Res> {
+        return (await this.RetryRequest<Res, Req>({ url, data, method: 'POST', ...config })).data
+    }
+
+    /** DownLoad 请求方法 */
+    public async DownLoad(url: string, data: any, config?: AxiosRequestConfig): Promise<void> {
+        /** 取消请求的令牌 */
+        const cancelToken = ref<CancelTokenSource>(axios.CancelToken.source())
+
+        // 设置连接超时
+        const timeoutId = setTimeout(() => {
+            cancelToken.value.cancel('超时手动取消请求')
+        }, config?.timeout ?? TIME_OUT)
+
+        // 移除配置的timeout，手动控制超时
+        if (config?.timeout)
+            config.timeout = undefined
+
+        /** 下载完整标志 */
+        let downloadCompleted = false
+
+        try {
+            const response = await this.instance.request({
+                url,
+                data,
+                method: 'POST',
+                responseType: 'blob',
+                cancelToken: cancelToken.value?.token,
+                onDownloadProgress: (progressEvent) => {
+                    if (downloadCompleted)
+                        return
+                    clearTimeout(timeoutId)
+
+                    const { lengthComputable, loaded, total, progress } = progressEvent
+
+                    if (progress) {
+                        const percentage = Math.floor(progress * 100) // 进度百分比，通常是 loaded 除以 total 的结果
+                        NProgress.set(percentage / 100) // 设置进度条
+                        console.log(`已加载字节数: ${loaded} / 总字节数: ${total}`)
+                    }
+
+                    if (!lengthComputable) { // 如果无法计算总进度，模拟进度条前进
+                        NProgress.inc() // 进度条略微前进
+                        console.log(`已加载字节数: ${loaded}`)
+                    }
+                },
+                ...config,
+            })
+
+            const contentDisposition = response.headers['content-disposition']
+            const filename = contentDisposition
+                ? decodeURI(contentDisposition.split(';')[1].split('filename=')[1])
+                : 'unknown'
+
+            const linkUrl = window.URL.createObjectURL(new Blob([response.data]))
+
+            const link = document.createElement('a')
+            link.style.display = 'none'
+            link.href = linkUrl
+            link.setAttribute('download', filename)
+            document.body.appendChild(link)
+            link.click()
+            document.body.removeChild(link)
+
+            NProgress.done()
+        }
+        catch (error) {
+            console.error('下载文件错误：', error)
+        }
+        finally {
+            downloadCompleted = true
+            NProgress.done()
+        }
+    }
+
+    /** CRUD 组件使用的请求方法，自带了 retry: 3 和 retryDelay: 1000，响应为原始响应 */
+    public CrudRequest<Res = any, Req = any>(config: AxiosRequestConfig<Req>): Promise<ResponseData<Res>> {
+        return this.RetryRequest<Res, Req>(config)
     }
 
     /** 请求令牌的生成和处理取消请求 */
@@ -154,6 +315,27 @@ class HttpClient {
         this.cancelTokenSourceMap.delete(requestKey)
     }
 
+    /** 错误通知处理函数 */
+    private handleErrorNotification(response: AxiosResponse) {
+        const fullMessage = response.data.message ?? ''
+        const [title, message] = fullMessage.includes(':')
+            ? fullMessage.split(':', 2)
+            : [undefined, fullMessage]
+
+        ElNotification({
+            type: 'error',
+            customClass: 'break-all', // 断字，添加换行符
+            title,
+            message,
+            offset: 54,
+        })
+    }
+
+    /** 判断是否是请求超时错误 */
+    private isTimeoutError(error: any): boolean {
+        return error.code === 'ECONNABORTED' && error.message.includes('timeout')
+    }
+
     /** 响应超时错误处理 */
     private async handleTimeoutError(error: AxiosError, retryRequest: (config: AxiosRequestConfig) => Promise<ResponseData<any>>) {
         const config = error.config
@@ -174,42 +356,22 @@ class HttpClient {
             const flag = await timeFlag
 
             if (flag) {
-                // 从 config 中提取 baseURL 和 url
-                return retryRequest({
-                    ...restConfig,
-                    baseURL: _originalBaseURL,
-                    url: _originalUrl,
-                    retry: retry - 1,
-                })
+                // 重试请求
+                return retryRequest({ ...restConfig, baseURL: _originalBaseURL, url: _originalUrl, retry: retry - 1 })
             }
         }
 
-        ElNotification({
-            type: 'error',
-            title: error.name,
-            message: error.message,
-        })
+        ElNotification({ type: 'error', title: '请求超时', offset: 54 })
+
         return Promise.reject(error)
     }
 
-    /** Request 请求方法 */
-    public Request<Res = any, Req = any>(config: AxiosRequestConfig<Req>): Promise<ResponseData<Res>> {
-        return this.instance.request<any, ResponseData<Res>, Req>(config)
-    }
-
-    /** GET 请求方法 */
-    public GET<Res = any, Req = any>(url: string, config?: AxiosRequestConfig<Req>): Promise<Res> {
-        return this.instance.get<any, Res, Req>(url, config)
-    }
-
-    /** POST 请求方法，响应为原始响应的 data 属性 */
-    public async POST<Res = any, Req = any>(url: string, data: Req, config?: AxiosRequestConfig<Req>): Promise<Res> {
-        return (await this.instance.post<any, ResponseData<Res>, Req>(url, data, config)).data
-    }
-
-    /** CRUD 组件使用的请求方法，自带了 retry: 3 和 retryDelay: 1000，响应为原始响应 */
-    public CrudRequest<Res = any, Req = any>(config: AxiosRequestConfig<Req>): Promise<ResponseData<Res>> {
-        return this.instance.request<Res, ResponseData<Res>, Req>({ method: 'POST', retry: 3, retryDelay: 1000, ...config })
+    /** 处理常见错误 */
+    private handleCommonErrors(error: any): void {
+        console.log('其他请求错误处理', error)
+        if (error.response?.status === 401) {
+            // 处理授权错误，例如跳转到登录页
+        }
     }
 }
 
@@ -217,4 +379,4 @@ class HttpClient {
 const Http = new HttpClient()
 
 export { HttpClient as default, Http, isCancel }
-export type { ResponseData }
+export type { ResponseData, CancelTokenSource }

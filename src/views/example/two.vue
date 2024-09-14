@@ -1,17 +1,17 @@
 <script setup lang="ts">
 definePage({
-    path: '/menu/1-1',
-    name: 'Menu_1-1',
+    path: '/example/two',
     meta: {
-        title: '菜单1-1',
+        title: '示例2',
         icon: 'i-ep:menu',
+        order: 2,
     },
 })
 </script>
 
 <template>
-    <div>
-        <h1>菜单1-1</h1>
+    <div class="div-c">
+        示例2
     </div>
 </template>
 

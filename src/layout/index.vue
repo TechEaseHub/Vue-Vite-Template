@@ -5,23 +5,24 @@ import Logo from './Logo'
 import Menu from './Menu'
 import UserMenu from './UserMenu.vue'
 
-import { nestedRoutes, router } from '@/router'
-
+const router = useRouter()
 const { height } = useWindowSize()
 
 const { isCollapse, layoutMode } = storeToRefs(LayoutStore())
+const { sortRoutes } = storeToRefs(useRouterStore())
 
 const DefaultActive = computed(() => router.currentRoute.value.path)
 
 const verticalMenu = computed(() => {
     if (layoutMode.value === 'mix') {
         const firstLevelPath = `/${router.currentRoute.value.path.split('/')[1]}`
-        const findRouter = nestedRoutes.find(item => item.path === firstLevelPath)
+        const findRouter = sortRoutes.value.find(item => item.path === firstLevelPath)
         return findRouter ? findRouter.children?.length ? findRouter.children : [findRouter] : []
     }
 
-    return nestedRoutes
+    return sortRoutes.value
 })
+const horizontalMenu = computed(() => sortRoutes.value)
 </script>
 
 <template>
@@ -39,7 +40,7 @@ const verticalMenu = computed(() => {
                 <Logo v-if="layoutMode === 'horizontal'" mode="horizontal" />
 
                 <el-menu v-if="['horizontal', 'mix'].includes(layoutMode)" class="flex-grow-1 border-none!" mode="horizontal" :default-active="DefaultActive" router>
-                    <Menu v-for="item in nestedRoutes" :key="item.path" :route="item" />
+                    <Menu v-for="item in horizontalMenu" :key="item.path" :route="item" />
                 </el-menu>
                 <div v-else />
 
@@ -47,8 +48,7 @@ const verticalMenu = computed(() => {
             </el-header>
             <!-- flex! flex-1 -->
             <el-main class="bg-[var(--el-color-info-light-9)]">
-                <!-- TODO:为什么要用 flex flex-col -->
-                <div class="flex flex-col">
+                <div class="h-full flex flex-col">
                     <RouterView />
                     <!-- <RouterView v-slot="{ Component }">
                         <KeepAlive>
