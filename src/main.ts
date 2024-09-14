@@ -14,7 +14,7 @@ const app = createApp(App)
 const pinia = createPinia()
 pinia.use(
     createPersistedState({
-        key: id => `__${id}`,
+        key: id => `${import.meta.env.VITE_NAMESPACE}__${id}`,
     }),
 )
 app.use(router)

@@ -2,7 +2,7 @@ import { URL, fileURLToPath } from 'node:url'
 
 import { defineConfig, loadEnv } from 'vite'
 import Vue from '@vitejs/plugin-vue'
-import vueDevTools from 'vite-plugin-vue-devtools'
+// import vueDevTools from 'vite-plugin-vue-devtools'
 
 import UnoCSS from 'unocss/vite'
 
@@ -18,6 +18,8 @@ import { VueRouterAutoImports } from 'unplugin-vue-router'
 
 // 打包分析
 import { visualizer } from 'rollup-plugin-visualizer'
+// Gzip 压缩
+import viteCompression from 'vite-plugin-compression'
 
 // https://vitejs.dev/config/
 export default defineConfig(({ mode }) => {
@@ -28,11 +30,11 @@ export default defineConfig(({ mode }) => {
             // https://github.com/posva/unplugin-vue-router
             VueRouter({
                 routesFolder: 'src/views',
-                exclude: ['src/views/backup/**/*.vue', 'src/views/public/**/*.vue'],
+                exclude: ['src/views/public/**/*.vue', 'src/views/**/components/**/*.vue', 'src/views/**/*comp*.vue'],
                 dts: 'types/typed-router.d.ts',
             }),
             Vue(),
-            vueDevTools(),
+            // vueDevTools(),
             UnoCSS(),
             AutoImport({
                 imports: [
@@ -42,10 +44,12 @@ export default defineConfig(({ mode }) => {
                     { 'vue-router/auto': ['useLink'] },
                 ],
                 dts: 'types/auto-imports.d.ts',
-                dirs: ['src/api', 'src/stores'], // 设置自动导入 API Stores 文件下的文件
+                dirs: ['src/stores', 'src/utils'],
                 resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
             }),
             Components({
+                directoryAsNamespace: false,
+                collapseSamePrefixes: false,
                 dts: 'types/components.d.ts',
                 resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
             }),
@@ -53,7 +57,9 @@ export default defineConfig(({ mode }) => {
                 open: false,
                 gzipSize: true,
             }),
-            // viteCompression(),
+            viteCompression({
+                threshold: 10250,
+            }),
         ],
         base: './',
         resolve: {
@@ -90,29 +96,21 @@ export default defineConfig(({ mode }) => {
                     chunkFileNames: 'js/[name]-[hash].js',
                     entryFileNames: 'js/[name]-[hash].js',
                     assetFileNames: '[ext]/[name]-[hash].[ext]',
-                    // manualChunks(id) {
-                    //     if (id.includes('node_modules')) {
-                    //         if (id.includes('element-plus'))
-                    //             return 'vendor-element-plus'
-                    //         if (id.includes('axios'))
-                    //             return 'vendor-axios'
-                    //         if (id.includes('lodash'))
-                    //             return 'vendor-lodash'
-                    //         if (id.includes('vue'))
-                    //             return 'vendor-vue'
-                    //         if (id.includes('pinia'))
-                    //             return 'vendor-pinia'
-                    //         return 'vendor'
-                    //     }
-                    //     if (id.includes('src/views'))
-                    //         return `vendor-views`
-
-                    //     if (id.includes('src/components'))
-                    //         return `vendor-components`
-
-                    //     if (id.includes('src/styles'))
-                    //         return 'styles'
-                    // },
+                    manualChunks(id) {
+                        if (id.includes('node_modules')) {
+                            if (id.includes('element-plus'))
+                                return 'vendor-element-plus'
+                            if (id.includes('axios'))
+                                return 'vendor-axios'
+                            if (id.includes('lodash'))
+                                return 'vendor-lodash'
+                            if (id.includes('vue'))
+                                return 'vendor-vue'
+                            if (id.includes('pinia'))
+                                return 'vendor-pinia'
+                            return 'vendor'
+                        }
+                    },
                 },
             },
         },
