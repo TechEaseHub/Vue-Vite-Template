@@ -1,6 +1,6 @@
-import { type LayoutMode, LayoutStore } from '@/stores'
-
 import LogoSrc from '@/assets/logo.svg'
+
+import type { LayoutMode } from '@/stores/useLayout'
 
 const { isCollapse } = storeToRefs(LayoutStore())
 const { changeCollapse } = LayoutStore()

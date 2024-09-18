@@ -3,8 +3,6 @@ import { h } from 'vue'
 
 import { useDark } from '@vueuse/core'
 
-import { LayoutStore } from '@/stores'
-
 const layoutStore = LayoutStore()
 
 const isDark = useDark()
@@ -36,7 +34,7 @@ const isDark = useDark()
         </div>
 
         <div>
-            <el-switch v-model="isDark" inline-prompt size="large" :active-action-icon=" h('i', { class: ['i-ep:sunny'] })" :inactive-action-icon=" h('i', { class: ['i-ep:moon'] })" style="--el-switch-off-color: #000" />
+            <el-switch v-model="isDark" inline-prompt size="large" :active-action-icon="h('i', { class: ['i-ep:sunny'] })" :inactive-action-icon="h('i', { class: ['i-ep:moon'] })" style="--el-switch-off-color: #000" />
         </div>
 
         <div>
