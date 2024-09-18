@@ -101,7 +101,7 @@ router.beforeEach((to, from) => {
             addRoute()
 
             if (to.path === '/404' && to.redirectedFrom)
-                return { path: to.redirectedFrom.fullPath, replace: true } // 重新导航到重定向之前的路径
+                return { path: to.redirectedFrom?.fullPath, replace: true } // 重新导航到重定向之前的路径
 
             return { ...to, replace: true } // 动态添加路由后，重新导航
         }
