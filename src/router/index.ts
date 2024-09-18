@@ -76,6 +76,19 @@ router.beforeEach((to, from) => {
     const { isLogin, isAddRoute } = storeToRefs(userStore)
     const { isAuth, addRoute } = userStore
 
+    // GitHub 无法使用代理，故移除登录认证
+    if (!isAddRoute.value) {
+        isAddRoute.value = true
+        addRoute()
+
+        if (to.path === '/404' && to.redirectedFrom)
+            return { path: to.redirectedFrom.fullPath, replace: true } // 重新导航到重定向之前的路径
+
+        return { ...to, replace: true } // 动态添加路由后，重新导航
+    }
+    return
+    // GitHub 无法使用代理，故移除登录认证
+
     if (isLogin.value) {
         if (path === '/login')
             return from // 阻止导航，保持在当前页面
