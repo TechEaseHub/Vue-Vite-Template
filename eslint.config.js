@@ -34,19 +34,27 @@ export default antfu(
     // 从第二个参数来看，它们是 ESLint Flat Configs
     // 你可以有多个配置
     {
-        // 记得在这里指定文件 glob，否则可能会导致 vue 插件处理非 vue 文件
+        // 通过 'files' 指定要应用规则的文件类型，避免 Vue 插件处理非 .vue 文件
         files: ['**/*.vue'],
         rules: {
+            // 强制操作符在换行时放在前一行
             'vue/operator-linebreak': ['error', 'before'],
+            // 关闭 Vue 文件中属性的默认排序规则
+            'vue/attributes-order': 'off',
         },
     },
     {
-        // 如果没有“文件”，它们是所有文件的通用规则
         rules: {
-            // 使用 smart-tabs 选项自动修复混合使用空格和制表符的问题
+            // 禁止混合使用空格和制表符，并自动修复智能标签（smart-tabs）
             'no-mixed-spaces-and-tabs': ['error', 'smart-tabs'],
+            // 允许在代码中使用 console 语句（如 console.log）
             'no-console': 'off',
+            // 关闭 node.js 中建议使用全局的 process 变量的规则
             'node/prefer-global/process': 'off',
+            // 提醒并警告未使用的导入，但不抛出错误
+            'unused-imports/no-unused-imports': 'warn',
+            // 禁止在定义之前使用变量、类，但允许在定义之前使用函数
+            '@typescript-eslint/no-use-before-define': ['error', { variables: false, functions: false, classes: true }],
         },
     },
 )

@@ -20,13 +20,12 @@ module.exports = {
 			confirmCommit: '是否提交commit ?',
 		},
 		types: [
-			{ value: 'init', name: '初始化|init:		🎉  初次提交', emoji: ':tada:' },
 			{ value: 'feat', name: '特性|feat:		✨  引入新功能', emoji: ':sparkles:' },
 			{ value: 'fix', name: '修复|fix:		🐛  修复一个错误', emoji: ':bug:' },
+			
 			{ value: 'format', name: '格式|format:		🎨  改进代码的结构/格式', emoji: ':art:' },
-			{ value: 'docs', name: '文档|docs:		📝  仅文档更改', emoji: ':memo:' },
-
 			{ value: 'remove', name: '删除|remove:		🔥  删除代码或文件', emoji: ':fire:' },
+			{ value: 'docs', name: '文档|docs:		📝  仅文档更改', emoji: ':memo:' },
 			{ value: 'style', name: '样式|style:		💄  添加或更新 UI 和样式文件', emoji: ':lipstick:' },
 
 			{ value: 'refactor', name: '重构|refactor:	♻️  代码重构', emoji: ':recycle:' },
@@ -35,9 +34,13 @@ module.exports = {
 			{ value: 'build', name: '构建|build:		📦️  构建流程、外部依赖', emoji: ':package:' },
 
 			{ value: 'ci', name: '集成|ci:		👷  修改 CI 配置、脚本', emoji: ':construction_worker:' },
-			{ value: 'revert', name: '回退|revert:		⏪️  回滚 commit', emoji: ':rewind:' },
 			{ value: 'merge', name: '合并|merge:		🔀  合并分支', emoji: ':twisted_rightwards_arrows:' },
+			{ value: 'revert', name: '回退|revert:		⏪️  回滚 commit', emoji: ':rewind:' },
 			{ value: 'breaking', name: '重大变更|breaking:	💥  引入重大变化', emoji: ':boom:' },
+			{ value: 'deps', name: '依赖|deps: 		📦️ 添加或更新依赖包', 'emoji': ':package:' },
+			{ value: 'hotfix', name: '紧急修复|hotfix: 	🩹 紧急修复生产问题', 'emoji': ':adhesive_bandage:' },
+			
+			{ value: 'init', name: '初始化|init:		🎉  初次提交', emoji: ':tada:' },
 			{ value: 'chore', name: '杂务|chore:		🔨  对其他的更改', emoji: ':hammer:' },
 		],
 		useEmoji: false,
