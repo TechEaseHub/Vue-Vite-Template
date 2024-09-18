@@ -9,7 +9,4 @@ dist
 !.vscode/extensions.json
 !.vscode/settings.json
 
-types/*
-!types/env.d.ts
-
 stats.html

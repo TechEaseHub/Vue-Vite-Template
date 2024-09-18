@@ -26,10 +26,7 @@ jobs:
       run: pnpm install
 
     - name: Run lint  # 运行代码检查
-      run: pnpm run lint
-
-    - name: Run typecheck  # 运行类型检查
-      run: pnpm run typecheck
+      run: pnpm run check
 
     - name: Build project  # 构建项目
       run: pnpm run build
