@@ -147,7 +147,9 @@ export const useUserStore = defineStore(
 
                 const rightsObj = JSON.parse(Res.rights)
                 Object.assign(rights, rightsObj)
-                permissions.value = generatePermissions(rightsObj)
+
+                if (Res.rights !== '{}')
+                    permissions.value = generatePermissions(rightsObj)
 
                 sessionStorage.setItem(TOKEN, Res.token)
                 ElMessage.success('登录成功')
