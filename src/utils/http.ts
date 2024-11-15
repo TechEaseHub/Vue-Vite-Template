@@ -332,6 +332,11 @@ class HttpClient {
     }
   }
 
+  /** EasyCrud 组件使用的请求方法，自带了 retry: 3 和 retryDelay: 1000，响应为原始响应 */
+  public EasyCrudRequest<Res = any, Req = any>(config: AxiosRequestConfig<Req>): Promise<ResponseData<Res>> {
+    return this.RetryRequest<Res, Req>(config)
+  }
+
   /** 请求令牌的生成和处理取消请求 */
   private handleCancelToken(config: InternalAxiosRequestConfig): void {
     const requestKey = `${config.method}:${config.url}`

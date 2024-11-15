@@ -7,11 +7,14 @@
 export {}
 declare global {
   const EffectScope: typeof import('vue')['EffectScope']
+  const ElDatePicker: typeof import('element-plus/es')['ElDatePicker']
   const ElIcon: typeof import('element-plus/es')['ElIcon']
   const ElImage: typeof import('element-plus/es')['ElImage']
+  const ElInput: typeof import('element-plus/es')['ElInput']
   const ElLink: typeof import('element-plus/es')['ElLink']
   const ElMenuItem: typeof import('element-plus/es')['ElMenuItem']
   const ElMessage: typeof import('element-plus/es')['ElMessage']
+  const ElMessageBox: typeof import('element-plus/es')['ElMessageBox']
   const ElNotification: typeof import('element-plus/es')['ElNotification']
   const ElSubMenu: typeof import('element-plus/es')['ElSubMenu']
   const Http: typeof import('../src/utils/http')['Http']
@@ -266,6 +269,7 @@ declare global {
   const useStyleTag: typeof import('@vueuse/core')['useStyleTag']
   const useSupported: typeof import('@vueuse/core')['useSupported']
   const useSwipe: typeof import('@vueuse/core')['useSwipe']
+  const useSystemParamsStore: typeof import('../src/stores/useSystemParams')['useSystemParamsStore']
   const useTemplateRef: typeof import('vue')['useTemplateRef']
   const useTemplateRefsList: typeof import('@vueuse/core')['useTemplateRefsList']
   const useTextDirection: typeof import('@vueuse/core')['useTextDirection']
