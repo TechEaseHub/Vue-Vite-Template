@@ -1,26 +1,34 @@
 {
   "compilerOptions": {
     "tsBuildInfoFile": "./node_modules/.tmp/tsconfig.app.tsbuildinfo",
-    "target": "ES2020",
+    "target": "ESNext",
+    "lib": ["ESNext", "DOM", "DOM.Iterable"],
+    "moduleDetection": "force",
     "useDefineForClassFields": true,
+    "baseUrl": ".",
     "module": "ESNext",
-    "lib": ["ES2020", "DOM", "DOM.Iterable"],
-    "skipLibCheck": true,
 
     /* Bundler mode */
     "moduleResolution": "Bundler",
+    "paths": {
+      "@/*": ["src/*"],
+      "@comp/*": ["src/components/*"],
+      "@views/*": ["src/views/*"]
+    },
+    "types": [
+      "vite/client",
+      "unplugin-vue-router/client"
+    ],
     "allowImportingTsExtensions": true,
-    "isolatedModules": true,
-    "moduleDetection": "force",
-    "noEmit": true,
-    "jsx": "preserve",
-
     /* Linting */
     "strict": true,
+    "noFallthroughCasesInSwitch": true,
     "noUnusedLocals": true,
     "noUnusedParameters": true,
-    "noFallthroughCasesInSwitch": true,
+    "noEmit": true,
+    "isolatedModules": true,
+    "skipLibCheck": true,
     "noUncheckedSideEffectImports": true
   },
-  "include": ["src/**/*.ts", "src/**/*.tsx", "src/**/*.vue"]
+  "include": ["src/**/*.ts", "src/**/*.vue", "types/*.d.ts"]
 }

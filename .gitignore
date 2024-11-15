@@ -2,3 +2,12 @@ node_modules
 dist
 dist-ssr
 *.local
+
+# Editor directories and files
+.vscode/*
+!.vscode/extensions.json
+!.vscode/settings.json
+
+# nlx @eslint/config-inspector@latest
+# nlx @eslint/config-inspector build
+.eslint-config-inspector
