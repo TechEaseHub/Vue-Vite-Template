@@ -1,0 +1,22 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="200" height="60">
+  <line
+    x1="0"
+    y1="50%"
+    x2="200"
+    y2="50%"
+    stroke="red"
+    stroke-width=".1"
+  />
+
+  <text
+    x="50%"
+    y="50%"
+    fill="#cccccc"
+    font-family="Arial"
+    font-size="40"
+    text-anchor="middle"
+    dy=".35em"
+  >
+    LOGO
+  </text>
+</svg>
