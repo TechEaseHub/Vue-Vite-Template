@@ -11,10 +11,14 @@ import Components from 'unplugin-vue-components/vite'
 import { VueRouterAutoImports } from 'unplugin-vue-router'
 import VueRouter from 'unplugin-vue-router/vite'
 
-// 开发者工具
-import VueDevTools from 'vite-plugin-vue-devtools'
 // 原子化 CSS
 import UnoCSS from 'unocss/vite'
+// 开发者工具
+import VueDevTools from 'vite-plugin-vue-devtools'
+// 打包分析
+import { visualizer } from 'rollup-plugin-visualizer'
+// GZIP 压缩
+import viteCompression from 'vite-plugin-compression'
 
 // https://vite.dev/config/
 export default defineConfig(({ mode }) => {
@@ -28,7 +32,6 @@ export default defineConfig(({ mode }) => {
         dts: 'types/typed-router.d.ts',
       }),
       Vue(),
-      VueDevTools(),
       AutoImport({
         imports: [
           'vue',
@@ -48,6 +51,12 @@ export default defineConfig(({ mode }) => {
         resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       }),
       UnoCSS(),
+      VueDevTools(),
+      visualizer({
+        open: true,
+        gzipSize: true,
+      }),
+      viteCompression(),
     ],
     resolve: {
       alias: {
@@ -81,7 +90,6 @@ export default defineConfig(({ mode }) => {
     },
     build: {
       rollupOptions: {
-        // 静态资源分类打包
         output: {
           chunkFileNames: 'js/[name]-[hash].js',
           entryFileNames: 'js/[name]-[hash].js',
@@ -92,12 +100,12 @@ export default defineConfig(({ mode }) => {
                 return 'vendor-element-plus'
               if (id.includes('axios'))
                 return 'vendor-axios'
+              if (id.includes('pinia'))
+                return 'vendor-pinia'
               if (id.includes('lodash'))
                 return 'vendor-lodash'
               if (id.includes('vue'))
                 return 'vendor-vue'
-              if (id.includes('pinia'))
-                return 'vendor-pinia'
               return 'vendor'
             }
           },
