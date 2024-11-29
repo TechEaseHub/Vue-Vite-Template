@@ -58,9 +58,9 @@ const horizontalMenu = computed(() => routerStore.sortRoutes)
       </el-header>
       <el-main class="bg-[var(--el-color-info-light-9)]">
         <div class="h-full flex flex-col">
-          <RouterView v-slot="{ Component, route }">
-            <keep-alive :max="10">
-              <component :is="Component" :key="route.name" />
+          <RouterView v-slot="{ Component }">
+            <keep-alive :max="3">
+              <component :is="Component" />
             </keep-alive>
           </RouterView>
         </div>

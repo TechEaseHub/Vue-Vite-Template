@@ -7,7 +7,6 @@ import { definitions, fields, type UserInfo } from './crud-default'
 const emits = defineEmits<CrudEmits<UserInfo>>()
 
 definePage({
-  path: '/example/custom',
   meta: {
     title: 'Crud 自定义',
     order: -1,
@@ -30,6 +29,9 @@ const editFormRef = ref<ElFormType>()
 </script>
 
 <template>
+  <div class="div-c">
+    Custom
+  </div>
   <div class="border rounded-[20px] bg-[var(--el-bg-color)] p-[20px]">
     <SearchForm
       v-model:search-form-ref="searchFormRef"

@@ -14,7 +14,7 @@ import VueRouter from 'unplugin-vue-router/vite'
 // 原子化 CSS
 import UnoCSS from 'unocss/vite'
 // 开发者工具
-import VueDevTools from 'vite-plugin-vue-devtools'
+// import VueDevTools from 'vite-plugin-vue-devtools'
 // 打包分析
 import { visualizer } from 'rollup-plugin-visualizer'
 // GZIP 压缩
@@ -45,13 +45,13 @@ export default defineConfig(({ mode }) => {
         resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       }),
       Components({
-        directoryAsNamespace: false,
-        collapseSamePrefixes: false,
+        deep: false,
+        globs: ['src/components/*/index.vue'],
         dts: 'types/components.d.ts',
         resolvers: [ElementPlusResolver({ importStyle: 'sass' })],
       }),
       UnoCSS(),
-      VueDevTools(),
+      // VueDevTools(),
       visualizer({
         open: true,
         gzipSize: true,

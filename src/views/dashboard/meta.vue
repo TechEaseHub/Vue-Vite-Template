@@ -1,8 +1,10 @@
 <script setup lang="ts">
 definePage({
-  path: '/dashboard/home',
+  alias: ['/'],
+  redirect: '/dashboard',
   meta: {
-    title: '仪表盘',
+    isMenu: true,
+    title: '首页1',
     icon: 'i-clarity:dashboard-line',
     order: -99,
   },
@@ -10,11 +12,5 @@ definePage({
 </script>
 
 <template>
-  <div class="div-c">
-    仪表盘
-  </div>
+  <div />
 </template>
-
-<style scoped lang="scss">
-
-</style>

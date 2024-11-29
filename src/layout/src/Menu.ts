@@ -22,7 +22,7 @@ export default defineComponent({
             { index: path },
             {
               default: () => h(ElIcon, () => h('i', { class: icon ?? 'i-ep:document' })),
-              title: () => title || name,
+              title: () => title ?? name,
             },
           )
 
@@ -32,7 +32,7 @@ export default defineComponent({
             { index: children![0].path },
             {
               default: () => h(ElIcon, () => h('i', { class: icon ?? 'i-ep:document' })),
-              title: () => children![0].meta?.title || children![0].name,
+              title: () => children![0].meta?.title ?? children![0].name,
             },
           )
 
@@ -48,7 +48,7 @@ export default defineComponent({
               },
               title: () => [
                 h(ElIcon, () => h('i', { class: icon ?? 'i-ep:folder' })),
-                h('span', title || name as string),
+                h('span', title ?? name as string),
               ],
             },
           )

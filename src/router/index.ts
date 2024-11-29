@@ -2,10 +2,12 @@ import { createRouter, createWebHashHistory } from 'vue-router'
 
 declare module 'vue-router' {
   interface RouteMeta {
-    /** 图标 */
-    icon?: string
+    /** 是否为根菜单，只做菜单的显示 */
+    isMenu?: boolean
     /** 标题 */
     title?: string
+    /** 图标 */
+    icon?: string
     /** 菜单排序 */
     order?: number
     /** 在菜单中隐藏 */

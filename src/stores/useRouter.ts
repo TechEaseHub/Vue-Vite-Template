@@ -1,4 +1,4 @@
-import type { RouteLocationNormalized, RouteRecordRaw } from 'vue-router'
+import type { RouteLocationNormalized, RouteMeta, RouteRecordRaw } from 'vue-router'
 import { routes } from 'vue-router/auto-routes'
 
 export const useRouterStore = defineStore(
@@ -8,14 +8,13 @@ export const useRouterStore = defineStore(
     const userStore = useUserStore()
 
     /** 权限路由表 */
-    const filterRoutes = computed(() => {
-      if (userStore.ownRole.includes('all'))
-        return routes
-
-      return FilterRoutes(routes, userStore.ownRole)
-    })
+    const filterRoutes = computed(() => FilterRoutes(routes, userStore.ownRole))
     /** 权限路由表排序 */
     const sortRoutes = computed(() => sortRoutesByOrder(filterRoutes.value))
+
+    console.log('routes', routes)
+    console.log('filterRoutes', filterRoutes.value)
+    console.log('sortRoutes', sortRoutes.value)
 
     /** 动态添加路由标志 */
     const isAddRoute = ref(false)
@@ -97,31 +96,70 @@ export const useRouterStore = defineStore(
  * @returns 过滤后的路由配置数组，仅包含角色数组中的路由
  */
 function FilterRoutes(routes: RouteRecordRaw[], roles: string[]): RouteRecordRaw[] {
+  const rolesSet = new Set(roles)
+
+  /** 权限判断函数 */
+  function hasPermission(meta: RouteMeta): boolean {
+    const isHideMenu = meta.hideInMenu === true
+    const requiredRoles = meta.auth ?? []
+
+    if (rolesSet.has('all'))
+      return !isHideMenu
+
+    const requiredRolesSet = new Set(requiredRoles)
+
+    const hasRequiredRole = requiredRolesSet.size === 0 || [...requiredRolesSet].some(role => rolesSet.has(role))
+
+    return !isHideMenu && hasRequiredRole
+  }
+
   return routes.reduce<RouteRecordRaw[]>((acc, route) => {
     const { meta = {}, children } = route
-    const isHideMenu = meta.hideInMenu === true
-    const requiredRoles = meta.auth || []
 
-    // 过滤掉需要隐藏在菜单中的路由
-    if (isHideMenu)
+    if (!hasPermission(meta))
       return acc
 
-    // 过滤掉角色不符合的路由
-    if (requiredRoles.length > 0 && !roles.some(role => requiredRoles.includes(role)))
-      return acc
-
-    // 创建一个新的路由对象
     const newRoute: RouteRecordRaw = { ...route }
 
-    // 递归处理子路由
+    // 如果该路由有子路由，则递归处理
     if (children && children.length > 0) {
-      newRoute.children = FilterRoutes(children, roles)
-      // 如果子路由为空，则不包括此路由
+      /** 符合权限的子路由 */
+      const filteredChildren: RouteRecordRaw[] = []
+      /** 是否进行了路由合并（判断是否合并过子路由信息到父路由） */
+      let hasMerged = false
+
+      for (const child of children) {
+        if (!hasMerged) {
+          // 如果子路由路径为空或标记为菜单，则合并子路由信息到父路由
+          // index.vue 不配置 path 就是最高优先级
+          if (child.path === '' || child.meta?.isMenu) {
+            const { path, name, component, children: _, ...restProps } = child
+            Object.assign(newRoute, restProps)
+            hasMerged = true
+            continue // 跳过本次循环，不添加到子路由中
+          }
+        }
+
+        // 如果子路由的路径不是以 '/' 开头，重新计算相对路径
+        if (!child.path.startsWith('/'))
+          child.path = `${newRoute.path.replace(/\/+$/, '')}/${child.path}`.replace(/\/+/g, '/')
+
+        filteredChildren.push(child)
+      }
+
+      if (!hasMerged) {
+        // 如果子路由没有菜单标记，取第一个子路由（未排序所以 order 不生效，按照vue-router/auto-routes的路由顺序的第一个）的 meta 添加到父路由中
+        const { path, name, component, children: _, ...restProps } = children[0]
+        Object.assign(newRoute, restProps)
+      }
+
+      newRoute.children = FilterRoutes(filteredChildren, roles)
+
+      // 如果没有符合条件的子路由，则跳过当前路由
       if (newRoute.children.length === 0)
         return acc
     }
 
-    // 将符合条件的路由添加到结果数组中
     acc.push(newRoute)
     return acc
   }, [])

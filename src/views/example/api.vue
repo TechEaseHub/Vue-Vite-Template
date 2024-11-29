@@ -6,7 +6,6 @@ const { getVerifyCode, login } = loginStore
 const { verifyCodeSrc, loginForm } = storeToRefs(loginStore)
 
 definePage({
-  path: '/example/api',
   meta: {
     title: 'API 接口',
     icon: 'i-ant-design:api-twotone',

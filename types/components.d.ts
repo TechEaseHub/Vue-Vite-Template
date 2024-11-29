@@ -7,9 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    ActionArea: typeof import('./../src/components/EasyCrud/src/ActionArea.vue')['default']
     EasyCrud: typeof import('./../src/components/EasyCrud/index.vue')['default']
-    EditForm: typeof import('./../src/components/EasyCrud/src/EditForm.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
     ElButtonGroup: typeof import('element-plus/es')['ElButtonGroup']
@@ -44,16 +42,9 @@ declare module 'vue' {
     ElTable: typeof import('element-plus/es')['ElTable']
     ElTableColumn: typeof import('element-plus/es')['ElTableColumn']
     ReButton: typeof import('./../src/components/ReButton/index.vue')['default']
-    ReCheckboxGroup: typeof import('./../src/components/EasyCrud/components/ReCheckboxGroup.vue')['default']
-    ReDeleteFlag: typeof import('./../src/components/EasyCrud/components/ReDeleteFlag.vue')['default']
     ReLink: typeof import('./../src/components/ReLink/index.vue')['default']
-    ReRadioGroup: typeof import('./../src/components/EasyCrud/components/ReRadioGroup.vue')['default']
-    ReSelect: typeof import('./../src/components/EasyCrud/components/ReSelect.vue')['default']
-    ReUpload: typeof import('./../src/components/EasyCrud/components/ReUpload.vue')['default']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SearchForm: typeof import('./../src/components/EasyCrud/src/SearchForm.vue')['default']
-    Table: typeof import('./../src/components/EasyCrud/src/Table.vue')['default']
   }
   export interface ComponentCustomProperties {
     vLoading: typeof import('element-plus/es')['ElLoadingDirective']
