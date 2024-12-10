@@ -7,6 +7,7 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
+    DynamicCrud: typeof import('./../src/components/DynamicCrud/index.vue')['default']
     EasyCrud: typeof import('./../src/components/EasyCrud/index.vue')['default']
     ElAside: typeof import('element-plus/es')['ElAside']
     ElButton: typeof import('element-plus/es')['ElButton']
