@@ -33,8 +33,7 @@ export function useActionHandler<T extends BaseRow>(id: string) {
     http.EasyCrudRequest<T[], T>({
       url: `${url.value}/${apiEndpoints.value.query}`,
       data: formData.value as T,
-    },
-    ).then((Res) => {
+    }).then((Res) => {
       const afterQueryResult = hookHandler('afterQueryHandler', Res.data)
 
       if (!afterQueryResult)
@@ -79,11 +78,11 @@ export function useActionHandler<T extends BaseRow>(id: string) {
 
   /** 删除 */
   function Remove(row: T) {
-    const keyToUse = rowKeys.value && rowKeys.value?.length > 0 ? rowKeys.value : rowKey.value
+    const keyToUse = rowKeys.value?.length ? rowKeys.value : rowKey.value
 
-    if (keyToUse === undefined) {
+    if (!keyToUse) {
       console.warn('rowKey 和 rowKeys 均未定义')
-      return undefined
+      return
     }
 
     formData.value = { ...getValueFromRow(row, keyToUse), deleteFlag: row.deleteFlag === 0 ? 1 : 0 }
@@ -95,19 +94,16 @@ export function useActionHandler<T extends BaseRow>(id: string) {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
-    })
-      .then(() => {
-        http.EasyCrudRequest<T, T>({
-          url: `${url}/${apiEndpoints.value.delete}`,
-          data: formData.value as T,
-        },
-        ).then(() => {
-          if (!hookHandler('afteRemoveHandler', crudOption))
-            return
-          ElMessage({ type: 'success', message: '删除成功', grouping: true })
-        })
+    }).then(() => {
+      http.EasyCrudRequest<T, T>({
+        url: `${url}/${apiEndpoints.value.delete}`,
+        data: formData.value as T,
+      }).then(() => {
+        if (!hookHandler('afteRemoveHandler', crudOption))
+          return
+        ElMessage({ type: 'success', message: '删除成功', grouping: true })
       })
-      .catch(() => { })
+    }).catch(() => {})
   }
 
   return { Query, Add, Edit, Remove }

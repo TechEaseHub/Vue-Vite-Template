@@ -1,4 +1,4 @@
-import { type BaseRow, type ColumnsType, type Fields, ReCheckboxGroup, ReRadioGroup } from '@/components/DynamicCrud'
+import { type BaseRow, type ColumnsType, type Fields, ReCheckboxGroup, ReDeleteFlag, ReRadioGroup } from '@/components/DynamicCrud'
 import ReSelect from '@/components/DynamicCrud/components/ReSelect.vue'
 
 export interface Example extends BaseRow {
@@ -46,12 +46,19 @@ export const definitions: ColumnsType<Example> = reactive({
   selector: {
     type: markRaw(ReSelect),
     label: '下拉框',
-    searchDefaultValue: 1,
+    // searchDefaultValue: 1,
     componentProps: {
       options: [
-        { label: '选项1', value: 1 },
-        { label: '选项2', value: 2 },
-        { label: '选项3', value: 3 },
+        // { label: '选项1', value: 1 },
+        // { label: '选项2', value: 2 },
+        // { label: '选项3', value: 3 },
+        { value: '#E63415', label: 'red' },
+        { value: '#FF6600', label: 'orange' },
+        { value: '#FFDE0A', label: 'yellow' },
+        { value: '#1EC79D', label: 'green' },
+        { value: '#14CCCC', label: 'cyan' },
+        { value: '#4167F0', label: 'blue' },
+        { value: '#6222C9', label: 'purple' },
       ],
     },
   },
@@ -117,6 +124,29 @@ export const definitions: ColumnsType<Example> = reactive({
   switch: {
     type: markRaw(ElSwitch),
     label: '开关',
+    render: ({ row }, { configStore }) => {
+      const { url, apiEndpoints, rowKey, rowKeys } = configStore
+
+      const keyToUse = rowKeys && rowKeys.length > 0 ? rowKeys : rowKey
+
+      let formData = { deleteFlag: row.deleteFlag === 0 ? 1 : 0 }
+      if (keyToUse) {
+        formData = {
+          deleteFlag: row.deleteFlag === 0 ? 1 : 0,
+        }
+      }
+
+      return h(
+        ReDeleteFlag,
+        {
+          'size': 'small',
+          'modelValue': row.deleteFlag ?? 0,
+          'onUpdate:modelValue': (newValue) => { row.deleteFlag = newValue },
+          'url': `${url}/${apiEndpoints?.deleteFlag}`,
+          'formData': formData,
+        },
+      )
+    },
   },
   image: {
     type: markRaw({}),

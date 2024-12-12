@@ -3,41 +3,34 @@ import type { CheckboxGroupValueType } from 'element-plus'
 
 defineOptions({ name: 'ReCheckboxGroup' })
 
-defineProps<{
-  options: Option[]
+const { options = [], isButton } = defineProps<{
+  options: {
+    label: string
+    value: string
+    disabled?: boolean
+  }[]
   isButton?: boolean
 }>()
 
-// 选项的接口
-interface Option {
-  label: string // 显示的标签文本
-  value: string // 选项的值
-  disabled?: boolean // 是否禁用该选项（可选）
-}
-
+// 定义双向绑定的modelValue，类型为CheckboxGroupValueType或undefined，且为必填
 const modelValue = defineModel<CheckboxGroupValueType | undefined>({ required: true })
+
+// 根据isButton属性动态选择使用ElCheckboxButton或ElCheckbox组件
+const Checkbox = computed(() => isButton ? ElCheckboxButton : ElCheckbox)
 </script>
 
 <template>
+  <!-- 使用ElCheckboxGroup组件，绑定modelValue -->
   <ElCheckboxGroup v-model="modelValue">
-    <template v-if="isButton">
-      <ElCheckboxButton
-        v-for="option in options"
-        :key="option.value"
-        :label="option.label"
-        :value="option.value"
-        :disabled="option.disabled"
-      />
-    </template>
-    <template v-else>
-      <ElCheckbox
-        v-for="option in options"
-        :key="option.value"
-        :label="option.label"
-        :value="option.value"
-        :disabled="option.disabled"
-        border
-      />
-    </template>
+    <!-- 动态渲染选项 -->
+    <component
+      :is="Checkbox"
+      v-for="option in options"
+      :key="option.value"
+      :label="option.label"
+      :value="option.value"
+      :disabled="option.disabled"
+      v-bind="!isButton && { border: true }"
+    />
   </ElCheckboxGroup>
 </template>

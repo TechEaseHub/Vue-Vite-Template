@@ -8,18 +8,16 @@ export type DefineForm<T> = {
   [K in Extract<keyof T, string>]: T[K] | undefined;
 }
 export type UseFormReturnType<T extends BaseRow> = ReturnType<typeof useForm<T>>
+
 export function useForm<T extends BaseRow>(id: string) {
   const configStore = useConfig<T>(id)
-  const definitions = configStore.source.definitions
-  const filter = configStore.source.fields.filter
-  const editor = configStore.source.fields.editor
+  const { definitions, fields: { filter, editor } } = configStore.source
 
   return defineStore(`${id}__form`, () => {
     const formVisible = ref(true)
     const drawerVisible = ref(false)
     const drawerTitle = ref<Exclude<FormModeType, 'Search'>>('Add')
 
-    // 表单数据定义
     const _searchForm = {} as DefineForm<T>
     const searchForm = reactive({}) as DefineForm<T>
     const _editForm = {} as DefineForm<T>
@@ -28,18 +26,17 @@ export function useForm<T extends BaseRow>(id: string) {
     const currentRow = ref({} as T)
     const formData = ref<T | FormData>({} as T)
 
-    // 对表单参数进行初始化赋值，并添加改变监听事件
-    for (const key in definitions) {
-      if (filter.includes(key)) {
-        _searchForm[key] = definitions[key].searchDefaultValue
-        searchForm[key] = definitions[key].searchDefaultValue
+    Object.keys(definitions).forEach((key) => {
+      const k = key as Extract<keyof T, string>
+      if (filter.includes(k)) {
+        _searchForm[k] = definitions[k].searchDefaultValue
+        searchForm[k] = definitions[k].searchDefaultValue
       }
-
-      if (editor.includes(key)) {
-        _editForm[key] = definitions[key].addDefaultValue
-        editForm[key] = definitions[key].addDefaultValue
+      if (editor.includes(k)) {
+        _editForm[k] = definitions[k].addDefaultValue
+        editForm[k] = definitions[k].addDefaultValue
       }
-    }
+    })
 
     function reset(formEl: FormInstance | undefined, mode: Exclude<FormModeType, 'Add'>, close?: boolean) {
       if (close) {
@@ -47,11 +44,10 @@ export function useForm<T extends BaseRow>(id: string) {
         const original = isSearchMode ? _searchForm : _editForm
         const target = isSearchMode ? searchForm : editForm
 
-        // 复制原始表单的数据到目标表单
-        for (const key in original) {
+        Object.keys(original).forEach((key) => {
           if (Object.prototype.hasOwnProperty.call(original, key))
             target[key as keyof DefineForm<T>] = original[key as keyof DefineForm<T>]
-        }
+        })
       }
       else {
         formEl?.resetFields()
@@ -62,15 +58,12 @@ export function useForm<T extends BaseRow>(id: string) {
       formVisible,
       drawerVisible,
       drawerTitle,
-
       _searchForm,
       searchForm,
       _editForm,
       editForm,
-
       currentRow,
       formData,
-
       reset,
     }
   })()

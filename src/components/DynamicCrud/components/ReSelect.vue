@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import type { VNode } from 'vue'
 import axios, { type CancelTokenSource } from 'axios'
 
 interface Option {
@@ -8,10 +7,7 @@ interface Option {
   disabled?: boolean
 }
 
-defineProps<{
-  options: Option[]
-  render?: (item: Option) => VNode
-}>()
+const { options } = defineProps<{ options: Option[] }>()
 
 // 定义 emit 事件类型
 const emit = defineEmits<{
@@ -100,27 +96,13 @@ function remoteMethod(query: string) {
         <i class="i-uiw:loading" />
       </el-icon>
     </template>
-
-    <template v-if="!render">
-      <ElOption
-        v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled"
-      />
-    </template>
-    <template v-else>
-      <ElOption
-        v-for="item in options"
-        :key="item.value"
-        :label="item.label"
-        :value="item.value"
-        :disabled="item.disabled"
-      >
-        <component :is="render(item)" />
-      </ElOption>
-    </template>
+    <ElOption
+      v-for="option in options"
+      :key="option.value"
+      :label="option.label"
+      :value="option.value"
+      :disabled="option.disabled"
+    />
   </ElSelect>
 </template>
 

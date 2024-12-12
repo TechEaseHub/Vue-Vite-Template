@@ -1,16 +1,17 @@
 import type { BaseRow, CrudOptions, RequestResult } from '../index'
 
 export function useHooks<T extends BaseRow>(hooks: HooksConfig<T>) {
-  function hookHandler<K extends keyof HooksConfig<T>>(
+  function hookHandler<
+    K extends keyof HooksConfig<T>,
+    F extends (...args: any) => any = NonNullable<HooksConfig<T>[K]>,
+  >(
     hookName: K,
-    Data: Parameters<NonNullable<HooksConfig<T>[K]>>[0],
-  ): ReturnType<NonNullable<HooksConfig<T>[K]>> {
-    const func = hooks[hookName]
-
-    if (func !== undefined && typeof func === 'function')
-      return func(Data as any) as ReturnType<NonNullable<HooksConfig<T>[K]>>
-    else
-      return Data as any
+    data: Parameters<F>[0],
+  ): ReturnType<F> {
+    const func = hooks[hookName] as F
+    return (func && typeof func === 'function')
+      ? func(data)
+      : data
   }
 
   return { hookHandler }

@@ -2,49 +2,32 @@ import type { BaseRow } from '../index'
 import { useConfig } from '../index'
 
 export type UseTableReturnType<T extends BaseRow> = ReturnType<typeof useTable<T>>
+
 export function useTable<T extends BaseRow>(id: string) {
-  const configStore = useConfig<T>(id)
-  const fields = configStore.source.fields
-  const pagination = configStore.pagination
+  const { source: { fields }, pagination } = useConfig<T>(id)
 
   return defineStore(`${id}__table`, () => {
     const loading = ref(false)
-
-    const tableData = ref<any[]>([
-      { index: 1 },
-      { index: 2 },
-      { index: 3 },
-      { index: 4 },
-      { index: 5 },
-      { index: 6 },
-      { index: 7 },
-      { index: 8 },
-      { index: 9 },
-      { index: 10 },
-    ])
-
-    const checkColumn = ref<(keyof T)[]>([...fields.column])
-    const tableColumns = computed(() => fields.expand.filter(key => (checkColumn.value as (keyof T)[]).includes(key)))
+    const tableData = ref<T[]>([])
+    const checkColumn = ref<string[]>([...fields.column] as string[])
+    const tableColumns = computed(() => fields.expand.filter(key =>
+      checkColumn.value.includes(key as string),
+    ))
 
     // 分页属性
-    const currentPage = ref(pagination.current)
-    const pageSize = ref(pagination.pageSize)
+    const { current: currentPage, pageSize, pageSizes, layout } = pagination
     const total = ref(0)
-    const pageSizes = ref(pagination.pageSizes)
-    const layout = ref(pagination.layout)
 
     return {
       loading,
-
       tableData,
       checkColumn,
       tableColumns,
-
-      currentPage,
-      pageSize,
+      currentPage: ref(currentPage),
+      pageSize: ref(pageSize),
       total,
-      pageSizes,
-      layout,
+      pageSizes: ref(pageSizes),
+      layout: ref(layout),
     }
   })()
 }

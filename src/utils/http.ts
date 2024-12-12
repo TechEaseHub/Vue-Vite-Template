@@ -101,10 +101,7 @@ class HttpClient {
         return config
       },
       (error) => {
-        clearTimeout(this.timer)
-        NProgress.done()
-        this.requestCount = 0
-
+        this.resetProgress()
         // console.log('【发起请求、失败】拦截器\n', error)
         return Promise.reject(error)
       },
@@ -115,11 +112,7 @@ class HttpClient {
   private httpInterceptorsResponse() {
     this.instance.interceptors.response.use(
       (response: AxiosResponse) => {
-        clearTimeout(this.timer)
-        this.requestCount--
-        if (this.requestCount === 0)
-          NProgress.done()
-
+        this.decrementRequestCount()
         // console.log('【响应成功】拦截器\n', response)
         this.removeCancelToken(response.config)
 
@@ -142,43 +135,31 @@ class HttpClient {
         // 根据 Content-Type 进行处理
         switch (contentType) {
           case 'application/octet-stream':
-            return response
-
           case 'application/x-msdownload':
             return response
-
           default:
             console.log('其他响应类型', contentType)
-
             break
         }
 
         // 处理接口返回的错误消息
         if (response.data.code !== 0) {
           this.handleErrorNotification(response)
-
           return Promise.reject(response)
         }
 
         return response.data
       },
       (error) => {
+        this.decrementRequestCount()
         // console.log('【响应失败】拦截器\n', error)
         if (error.config)
           this.removeCancelToken(error.config)
 
-        if (this.isTimeoutError(error)) {
-          this.requestCount--
+        if (this.isTimeoutError(error))
           return this.handleTimeoutError(error, this.Request.bind(this))
-        }
 
         this.handleCommonErrors(error)
-
-        clearTimeout(this.timer)
-        this.requestCount--
-        if (this.requestCount === 0)
-          NProgress.done()
-
         return Promise.reject(error)
       },
     )
@@ -419,6 +400,22 @@ class HttpClient {
     if (error.response?.status === 401) {
       // 处理授权错误，例如跳转到登录页
     }
+    ElMessage({ type: 'error', message: error.message })
+  }
+
+  /** 重置进度条 */
+  private resetProgress() {
+    clearTimeout(this.timer)
+    NProgress.done()
+    this.requestCount = 0
+  }
+
+  /** 减少请求计数 */
+  private decrementRequestCount() {
+    clearTimeout(this.timer)
+    this.requestCount--
+    if (this.requestCount === 0)
+      NProgress.done()
   }
 }
 

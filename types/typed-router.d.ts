@@ -26,6 +26,7 @@ declare module 'vue-router/auto-routes' {
     '/example/DynamicCrud/': RouteRecordInfo<'/example/DynamicCrud/', '/example/DynamicCrud', Record<never, never>, Record<never, never>>,
     '/example/DynamicCrud/custom': RouteRecordInfo<'/example/DynamicCrud/custom', '/example/DynamicCrud/custom', Record<never, never>, Record<never, never>>,
     '/example/DynamicCrud/default': RouteRecordInfo<'/example/DynamicCrud/default', '/example/DynamicCrud/default', Record<never, never>, Record<never, never>>,
+    '/example/DynamicSlots': RouteRecordInfo<'/example/DynamicSlots', '/example/DynamicSlots', Record<never, never>, Record<never, never>>,
     '/example/EasyCrud/': RouteRecordInfo<'/example/EasyCrud/', '/example/EasyCrud', Record<never, never>, Record<never, never>>,
     '/example/EasyCrud/crud-custom': RouteRecordInfo<'/example/EasyCrud/crud-custom', '/example/EasyCrud/crud-custom', Record<never, never>, Record<never, never>>,
     '/example/EasyCrud/crud-default': RouteRecordInfo<'/example/EasyCrud/crud-default', '/example/EasyCrud/crud-default', Record<never, never>, Record<never, never>>,

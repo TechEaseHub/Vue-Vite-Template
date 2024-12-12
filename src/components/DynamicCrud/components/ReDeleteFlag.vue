@@ -13,38 +13,34 @@ const loading = ref(false)
 
 // 使用 async/await 优化的异步逻辑，用于在切换状态前确认操作
 async function beforeChange(): Promise<boolean> {
-  return new Promise((resolve) => {
-    ElMessageBox.confirm('确定要改变当前行数据状态吗？', '提示', {
+  try {
+    await ElMessageBox.confirm('确定要改变当前行数据状态吗？', '提示', {
       confirmButtonText: '确定',
       cancelButtonText: '取消',
       type: 'warning',
     })
-      .then(async () => {
-        loading.value = true
 
-        try {
-          await Http.EasyCrudRequest({
-            url: props.url,
-            data: props.formData,
-          })
-          ElMessage({ type: 'success', message: '修改成功' })
-          resolve(true)
-        }
-        catch {
-          ElMessage({ type: 'error', message: '修改失败' })
-          resolve(false)
-        }
-        finally {
-          // 无论成功与否，都将加载状态设置为 false
-          loading.value = false
-        }
-      })
-      .catch(() => {
-        ElMessage({ type: 'info', message: '已取消' })
-        loading.value = false
-        resolve(false)
-      })
-  })
+    loading.value = true
+
+    await Http.EasyCrudRequest({
+      url: props.url,
+      data: props.formData,
+    })
+
+    ElMessage({ type: 'success', message: '修改成功' })
+    return true
+  }
+  catch (error) {
+    console.log(error)
+    if (error === 'cancel')
+      ElMessage({ type: 'info', message: '已取消' })
+
+    return false
+  }
+  finally {
+    // 无论成功与否，都将加载状态设置为 false
+    loading.value = false
+  }
 }
 </script>
 

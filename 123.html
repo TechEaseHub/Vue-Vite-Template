@@ -1,0 +1,96 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>View Certification Online</title>
+    <style>
+      h2 {
+        text-align: center;
+      }
+
+      .img-container {
+        width: 100%;
+        height: auto;
+      }
+
+      img {
+        width: 100%;
+        height: auto;
+      }
+
+      .none-image {
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        font-size: 14px;
+        color: #c0c4cc;
+        vertical-align: middle;
+        background-color: #f5f7fa;
+        width: 100%;
+        height: 30vh;
+      }
+
+      .description {
+        margin-left: 10px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <h2>View Certification Online</h2>
+    <div class="img-container">
+      <img id="main-image" src="http://wj.haoju.me/75d9484f190b42aeb6a42d80526c6123.png" />
+      <div class="description">Name： Miah Lablu</div>
+      <div class="description">Certificate No.： SJC001202412090004</div>
+      <div class="description">Issuer： 3onedata Co., Ltd. and/or its affiliates</div>
+    </div>
+  </body>
+</html>
+
+<!-- <script>
+  var main = document.querySelector('.img-container')
+  var img = document.querySelector('#main-image')
+
+  const params = new URLSearchParams(window.location.search)
+  const paramValue = params.get('id')
+  console.log(paramValue)
+
+  let url = 'https://3onedataqz.com/interface-server/api/getOneAgreementDetail.json?agreementID='
+  url += '7e71e250a9ae4fc086aaf0b334e4de17'
+
+  fetch(url, {
+    method: 'POST',
+  })
+    .then((response) => response.json())
+    .then((data) => {
+      if (data.header.code !== 0) {
+        main.innerHTML = '加载失败……'
+      } else {
+        let responseData = data.body.data
+        if (!responseData.agreementImage) {
+          var newElement = document.createElement('div')
+          newElement.className = 'none-image'
+          newElement.innerHTML = '图片缺失，请联系管理员'
+          main.appendChild(newElement)
+        } else {
+          img.src = responseData.agreementImage
+        }
+        // 增加3条描述
+        let texts = [
+          'Name： ' + (responseData.name ? responseData.name : '暂无'),
+          'Certificate No.： ' + 'SJC001202412090004',
+          'Issuer： ' + '3onedata Co., Ltd. and/or its affiliates',
+        ]
+        texts.forEach((text) => {
+          let newdiv = document.createElement('div')
+          newdiv.className = 'description'
+          newdiv.innerHTML = text
+          main.appendChild(newdiv)
+        })
+      }
+    })
+    .catch((err) => {
+      main.innerHTML = '加载失败……'
+    })
+</script> -->

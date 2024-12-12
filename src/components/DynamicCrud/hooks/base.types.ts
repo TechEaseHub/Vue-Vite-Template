@@ -81,9 +81,9 @@ export interface ColumnsItemType<T extends BaseRow, K extends keyof T> {
   label: string
 
   /** 新增/编辑模式 显示状态 */
-  disabled?: (Mode: Exclude<FormModeType, 'Search'>) => boolean
+  disabled?: (mode: Exclude<FormModeType, 'Search'>) => boolean
   /** 新增/编辑模式 显示状态 */
-  visible?: (Mode: Exclude<FormModeType, 'Search'>) => boolean
+  visible?: (mode: Exclude<FormModeType, 'Search'>) => boolean
   /** ElCol 的 span 属性 */
   span?: number
 

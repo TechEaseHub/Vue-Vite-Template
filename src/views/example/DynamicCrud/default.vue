@@ -64,9 +64,9 @@ function asd(a: DefineForm<Example>, b: keyof Example) {
 </script>
 
 <template>
-  <div class="div-c">
+  <!-- <div class="div-c">
     Default
-  </div>
+  </div> -->
   <DynamicCrud v-bind="aribitaion" @change:search-form="asd">
     <!-- 搜索表单 -->
     <!-- <template #search-form>
