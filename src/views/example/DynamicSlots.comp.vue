@@ -11,11 +11,13 @@ defineSlots<{
 const slots = useSlots()
 // 使用 keyof 提取插槽名称类型
 const slotNames = Object.keys(slots || {}) as (keyof typeof slots)[]
+console.log(slotNames)
 </script>
 
 <template>
   <DynamicSlotsComp2>
     <template v-for="name in slotNames" #[name]="slotData">
+      {{ console.log(name, slotData) }}
       <slot :name="name" v-bind="typeof slotData === 'object' ? slotData : {}" />
     </template>
   </DynamicSlotsComp2>

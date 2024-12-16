@@ -26,28 +26,24 @@ export function InitDynamicStore<T extends BaseRow>(props: CrudProps<T>, emits?:
 
   // 对表单参数进行初始化赋值，并添加改变监听事件
   for (const key in definitions) {
-    if (filter.includes(key)) {
-      if (debug && emits) {
-        watch(
-          () => searchForm[key],
-          debounce((newVal, oldVal) => {
-            console.log(`searchForm: \`${key}\` changed \n from: ${oldVal} \n to: ${newVal}`)
-            emits('change:searchForm', searchForm, key)
-          }, 500),
-        )
-      }
+    if (debug && emits && filter.includes(key)) {
+      watch(
+        () => searchForm[key],
+        debounce((newVal, oldVal) => {
+          console.log(`searchForm: \`${key}\` changed \n from: ${oldVal} \n to: ${newVal}`)
+          emits('change:searchForm', searchForm, key)
+        }, 500),
+      )
     }
 
-    if (editor.includes(key)) {
-      if (debug && emits) {
-        watch(
-          () => editForm[key],
-          debounce((newVal, oldVal) => {
-            console.log(`editForm: \`${key}\` changed \n from: ${oldVal} \n to: ${newVal}`)
-            emits('change:editForm', editForm, key)
-          }, 500),
-        )
-      }
+    if (debug && emits && editor.includes(key)) {
+      watch(
+        () => editForm[key],
+        debounce((newVal, oldVal) => {
+          console.log(`editForm: \`${key}\` changed \n from: ${oldVal} \n to: ${newVal}`)
+          emits('change:editForm', editForm, key)
+        }, 500),
+      )
     }
   }
 

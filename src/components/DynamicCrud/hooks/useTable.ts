@@ -15,7 +15,7 @@ export function useTable<T extends BaseRow>(id: string) {
     ))
 
     // 分页属性
-    const { current: currentPage, pageSize, pageSizes, layout } = pagination
+    const { current, pageSize, pageSizes, layout } = pagination
     const total = ref(0)
 
     return {
@@ -23,7 +23,7 @@ export function useTable<T extends BaseRow>(id: string) {
       tableData,
       checkColumn,
       tableColumns,
-      currentPage: ref(currentPage),
+      currentPage: ref(current),
       pageSize: ref(pageSize),
       total,
       pageSizes: ref(pageSizes),

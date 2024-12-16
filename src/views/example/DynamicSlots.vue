@@ -1,5 +1,6 @@
 <!-- 使用 DynamicSlots 组件的父组件 -->
 <script setup lang="ts">
+import DynamicCrudNew from '@comp/DynamicCrudNew/index.vue'
 import DynamicSlots from './DynamicSlots.comp.vue'
 </script>
 
@@ -16,4 +17,7 @@ import DynamicSlots from './DynamicSlots.comp.vue'
       <footer>这是底部内容</footer>
     </template>
   </DynamicSlots>
+  <div class="p-4">
+    <DynamicCrudNew />
+  </div>
 </template>
