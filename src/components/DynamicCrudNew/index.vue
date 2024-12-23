@@ -1,138 +1,65 @@
-<script setup lang="ts">
-import type { BaseRow, ColumnsType, Fields } from './hooks'
-import { componentMap } from './hooks'
+<script setup lang="ts" generic="T">
+import type { CrudEmits, CrudProps, StringKeyOf } from './index'
+import { debounce } from 'lodash-es'
+import { useActionHandler, useConfig, useForm, useTable } from './hooks'
+import { ActionButtons, DataTable, EditForm, SearchForm } from './src'
 
-interface MyRow extends BaseRow {
-  age: number
+const props = defineProps<CrudProps<T>>()
+const emits = defineEmits<CrudEmits<T>>()
+
+// 创建动态 store
+const useId = props.url
+const configStore = useConfig<T>(useId, props)
+const formStore = useForm<T>(useId)
+const tableStore = useTable<T>(useId)
+useActionHandler<T>(useId)
+
+const debug = computed(() => configStore.debug)
+const definitions = computed(() => configStore.source.definitions)
+const filter = computed(() => configStore.source.fields.filter)
+const editor = computed(() => configStore.source.fields.editor)
+const searchForm = formStore.searchForm
+const editForm = formStore.editForm
+
+// 对表单参数进行初始化赋值，并添加改变监听事件
+for (const key in definitions.value) {
+  const k = key as StringKeyOf<T>
+  if (debug.value && emits && filter.value.includes(k)) {
+    watch(
+      () => searchForm[k],
+      debounce((newVal, oldVal) => {
+        console.log(`searchForm: \`${k}\` changed \n from: ${oldVal} \n to: ${newVal}`)
+        emits('change', 'searchForm', searchForm, k)
+      }, 500),
+    )
+  }
+
+  if (debug.value && emits && editor.value.includes(k)) {
+    watch(
+      () => editForm[k],
+      debounce((newVal, oldVal) => {
+        console.log(`editForm: \`${k}\` changed \n from: ${oldVal} \n to: ${newVal}`)
+        emits('change', 'editForm', editForm, k)
+      }, 500),
+    )
+  }
 }
 
-const definitions: ColumnsType<MyRow> = {
-  // id: {
-  //   type: 'input',
-  //   label: 'ID',
-  //   searchDefaultValue: 1,
-  //   componentProps: {
-  //     disabled: false,
-  //     onInput: (value: string) => {
-  //       console.log(value)
-  //     },
-  //     // options: [
-  //     //   { label: '30', value: 30 },
-  //     //   { label: '25', value: 25 },
-  //     // ],
-  //   },
-  // },
-  name: {
-    type: 'orgSelect',
-    label: 'Name',
-    componentSlot: {
-      // 在默认插槽中，使用 v-for 循环 options 数组，生成 el-option 组件
-      // Start of Selection
-      default: () => {
-        const options = [
-          { label: '30', value: 30 },
-          { label: '25', value: 25 },
-        ]
-        return options.map(option => h(ElOption, option))
-      },
-    },
-  },
-  age: {
-    type: 'select',
-    label: 'Age',
-    searchDefaultValue: 30,
-    componentProps: {
-      // disabled: false,
-      // onInput: (value: string) => {
-      //   console.log(value)
-      // },
-      options: [
-        { label: '30', value: 30 },
-        { label: '25', value: 25 },
-      ],
-    },
-  },
-}
-
-const fields: Fields<keyof typeof definitions> = {
-  filter: ['id', 'name', 'age'],
-  editor: ['id', 'name', 'age'],
-  expand: ['id', 'name', 'age'],
-  column: ['id', 'name', 'age'],
-}
-
-const form = reactive<MyRow>({
-  id: 1,
-  name: 'John Doe',
-  age: 30,
+onUnmounted(() => {
+  // 销毁 动态 store
+  configStore.$dispose()
+  formStore.$dispose()
+  tableStore.$dispose()
 })
-
-function EForm(props: { title: string }, context: any) {
-  // 1. 标题部分
-  const header = h('h1', `DynamicCrudNew ${props.title}`)
-
-  // 使用 computed 来追踪 form 的变化
-  const formInfoText = computed(() => `form: ${JSON.stringify(form)}`)
-
-  // 2. 表单信息和按钮部分
-  const formInfo = h('div', formInfoText.value)
-
-  console.log(1231, context)
-
-  // 5. 根 div，将所有部分组合在一起
-  return h('div', [header, formInfo])
-}
-
-// const EForm = defineComponent({
-//   name: 'EForm',
-//   props: {
-//     title: {
-//       type: String,
-//       required: true,
-//     },
-//   },
-//   setup(props, context) {
-//     // 1. 标题部分
-//     const header = h('h1', `DynamicCrudNew ${props.title}`)
-
-//     // 2. 表单信息和按钮部分
-//     const formInfo = h('div', `form: ${JSON.stringify(form)}`)
-
-//     console.log(1231, context)
-
-//     // 5. 根 div，将所有部分组合在一起
-//     return () => h('div', [header, formInfo])
-//   },
-// })
 </script>
 
 <template>
-  <div>
-    <div>
-      <EForm title="123" />
-    </div>
-    <ElForm :model="form">
-      <ElFormItem
-        v-for="item in fields.filter"
-        :key="item"
-        :label="definitions[item]?.label"
-      >
-        <component
-          :is="componentMap[definitions[item].type]"
-          v-if="definitions[item]"
-          v-model="form[item]"
-          v-bind="definitions[item].componentProps"
-        >
-          <template v-for="(slotFunc, name) in definitions[item].componentSlot || {}" #[name]="slotData">
-            <component :is="slotFunc" v-if="slotFunc" :key="name" />
-            <slot v-else :name="name" v-bind="slotData" />
-          </template>
-        </component>
-      </ElFormItem>
-    </ElForm>
+  <div class="border rounded-[20px] bg-[var(--el-bg-color)] p-[20px]">
+    <SearchForm :use-id />
+    <ActionButtons :use-id />
+    <DataTable :use-id />
+    <EditForm :use-id />
   </div>
 </template>
 
-<style scoped lang="scss">
-
-</style>
+<style lang="scss" scoped></style>
